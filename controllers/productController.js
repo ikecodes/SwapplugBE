@@ -16,38 +16,28 @@ module.exports = {
       const { secure_url, public_id } = await cloudinary.uploader.upload(
         file.path,
         null,
-        { folder: "Product" }
+        { folder: "TB_Product" }
       );
       return {
         original: secure_url,
-        thumbnail: secure_url,
         publicId: public_id,
       };
     });
     const images = await Promise.all(imagesPromises);
 
     const product = await Product.create({
-      title: req.body.title,
-      type: req.body.type,
+      about: req.body.about,
+      status: req.body.status,
+      name: req.body.name,
       category: req.body.category,
-      bathrooms: req.body.bathrooms,
-      bedrooms: req.body.bedrooms,
-      toilets: req.body.toilets,
-      size: req.body.size,
-      state: req.body.state,
-      region: req.body.region,
-      location: req.body.location,
       price: req.body.price,
-      description: req.body.description,
-      specialFeatures: req.body.specialFeatures,
-      furnished: req.body.furnished,
-      newlyBuilt: req.body.newlyBuilt,
+      fault: req.body.fault,
+      expiryDate: req.body.expiryDate,
       images: images,
-      agent: req.user.id,
+      seller: req.user._id,
     });
 
     await User.findByIdAndUpdate(req.user.id, {
-      totalListings: req.user.totalListings + 1,
       posted: req.user.posted + 1,
     });
 
@@ -58,10 +48,7 @@ module.exports = {
   }),
 
   getAllProducts: catchAsync(async (req, res, next) => {
-    const products = new APIFeatures(
-      Product.find({ isVerified: { $ne: false } }),
-      req.query
-    )
+    const products = new APIFeatures(Product.find(), req.query)
       .filter()
       .sort()
       .limitFields()
@@ -94,7 +81,7 @@ module.exports = {
    */
   getAllProductsByUser: catchAsync(async (req, res, next) => {
     const products = await Product.find({
-      agent: req.user._id,
+      seller: req.user._id,
     });
     res.status(200).json({
       status: "success",
@@ -109,7 +96,6 @@ module.exports = {
   getProduct: catchAsync(async (req, res, next) => {
     const product = await Product.findOne({
       _id: req.params.id,
-      isVerified: { $ne: false },
     });
 
     if (!product)
@@ -123,7 +109,7 @@ module.exports = {
 
   /**
    * @function deleteProduct
-   * @route /api/v1/products
+   * @route /api/v1/products/:id
    * @method DELETE
    */
   deleteProduct: catchAsync(async (req, res, next) => {

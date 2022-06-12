@@ -2,13 +2,7 @@ const mongoose = require("mongoose");
 const slugify = require("slugify");
 const productSchema = new mongoose.Schema(
   {
-    images: [
-      {
-        publicId: String,
-        original: String,
-      },
-    ],
-    about: Number,
+    about: String,
     status: String,
     name: String,
     category: String,
@@ -20,6 +14,12 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    images: [
+      {
+        publicId: String,
+        original: String,
+      },
+    ],
     seller: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
