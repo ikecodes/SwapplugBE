@@ -26,6 +26,9 @@ router
   .patch(upload.single("photo"), AuthController.updatePhoto);
 router.route("/updatePassword").patch(AuthController.updatePassword);
 
+router.route("/followUser/:id").patch(UserController.followUser);
+router.route("/unfollowUser/:id").patch(UserController.unfollowUser);
+
 router.use(role("admin"));
 router.route("/").get(UserController.getAllUsers);
 router.route("/:id").get(UserController.getUser);

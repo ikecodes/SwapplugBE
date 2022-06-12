@@ -66,6 +66,12 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    following: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+      },
+    ],
     emailConfirmToken: Number,
     passwordChangedAt: Date,
     passwordResetToken: Number,
