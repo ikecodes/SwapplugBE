@@ -8,7 +8,7 @@ const router = Router();
 router.route("/").get(ProductController.getAllProducts);
 router
   .route("/getAllProductsByUser")
-  .get(auth, ProductController.getAllProductsByUser); // added auth middleware to this
+  .get(auth, ProductController.getAllProductsByUser);
 router.route("/:id").get(ProductController.getProduct);
 
 router.use(auth);

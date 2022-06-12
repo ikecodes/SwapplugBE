@@ -9,11 +9,11 @@ const router = Router();
 
 router.route("/").post(upload.single("companyCac"), AuthController.signup);
 router.route("/session").post(AuthController.login);
-router.route("/sendEmail").post(AuthController.sendEmail);
+router.route("/sendEmail").post(AuthController.reSendEmail);
 router.route("/confirmEmail").post(AuthController.confirmEmail);
 router.route("/forgotPassword").post(AuthController.forgotPassword);
-
-router.route("/resetPassword/:token").patch(AuthController.resetPassword);
+router.route("/passwordResetConfirm").post(AuthController.passwordResetConfirm);
+router.route("/resetPassword").patch(AuthController.resetPassword);
 
 router.use(auth);
 router.route("/me").get(AuthController.getMe);

@@ -35,7 +35,7 @@ module.exports = {
     await newUser.save({ validateBeforeSave: false });
     const options = {
       mail: newUser.email,
-      subject: "Welcome to Spid Realty!",
+      subject: "Welcome to Trade By Barter!",
       email: "../email/welcome.ejs",
       firtname: newUser.firstName,
       token: token,
@@ -46,7 +46,7 @@ module.exports = {
       res.status(200).json({
         status: "success",
         message:
-          "signup  successful, email verification token sent to your mail",
+          "signup successful, email verification token sent to your mail",
         data: newUser,
       });
     } catch (error) {
@@ -165,20 +165,18 @@ module.exports = {
     const resetToken = user.createPasswordResetToken();
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `https://www.spidrealty.com/reset-password?${resetToken}`;
-
     const options = {
       mail: user.email,
       subject: "Password Reset",
       email: "../email/forgotPassword.ejs",
       firtname: user.firstname,
-      token: resetUrl,
+      token: resetToken,
     };
     try {
       await Mail(options);
       res.status(200).json({
         status: "success",
-        message: "Token sent to email!",
+        message: "Password reset token sent to email!",
       });
     } catch (err) {
       user.passwordResetToken = undefined;
@@ -192,30 +190,40 @@ module.exports = {
   }),
 
   /**
+   * @function passwordResetConfirm
+   * @route /api/v1/users/passwordResetConfirm
+   * @method POST
+   */
+  passwordResetConfirm: catchAsync(async (req, res, next) => {
+    const user = await User.findOne({
+      email: req.body.email,
+      passwordResetToken: req.body.token,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+    if (!user) {
+      return next(new AppError("token is invalid or has expired", 400));
+    }
+    user.passwordResetExpires = undefined;
+    user.passwordResetToken = undefined;
+    await user.save();
+    res.status(200).json({
+      status: "success",
+      message: "Token confirmation successful, you can now reset passsword",
+    });
+  }),
+
+  /**
    * @function resetPassword
    * @route /api/v1/users/resetPassword
    * @method PATCH
    */
   resetPassword: catchAsync(async (req, res, next) => {
-    const hashedPassword = crypto
-      .createHash("sha256")
-      .update(req.params.token)
-      .digest("hex");
-
     const user = await User.findOne({
-      passwordResetToken: hashedPassword,
-      passwordResetExpires: { $gt: Date.now() },
+      email: req.body.email,
     });
 
-    //2) set new password id token !expired and user still exists
-    if (!user) {
-      return next(new AppError("token is invalid or has expired", 400));
-    }
     user.password = req.body.password;
-    user.passwordResetExpires = undefined;
-    user.passwordResetToken = undefined;
     await user.save();
-
     res.status(200).json({
       status: "success",
       message: "password reset successful",
@@ -253,12 +261,7 @@ module.exports = {
    */
   updatePhoto: catchAsync(async (req, res, next) => {
     if (req.body.password || req.body.passwordConfirm) {
-      next(
-        new AppError(
-          "this route is not for password update, please /updateMyPassword",
-          400
-        )
-      );
+      next(new AppError("this route is not for password update", 400));
     }
     if (req.user.photoPublicId)
       await cloudinary.uploader.destroy(req.user.photoPublicId);
@@ -266,7 +269,7 @@ module.exports = {
       req.file.path,
       null,
       {
-        folder: "Profile",
+        folder: "TB_Profile",
       }
     );
 
@@ -320,7 +323,7 @@ module.exports = {
       req.file.path,
       null,
       {
-        folder: "ID",
+        folder: "TB_ID",
       }
     );
 
