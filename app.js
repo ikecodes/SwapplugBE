@@ -7,6 +7,8 @@ const mongoSanitize = require("express-mongo-sanitize");
 const errorHandler = require("./middlewares/errorHandler");
 const userRouter = require("./routers/userRouter");
 const productRouter = require("./routers/productRouter");
+const orderRouter = require("./routers/orderRouter");
+const favoriteRouter = require("./routers/favoriteRouter");
 
 const app = express();
 
@@ -26,6 +28,8 @@ app.use(mongoSanitize());
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/products", productRouter);
+app.use("/api/v1/orders", orderRouter);
+app.use("/api/v1/favorites", favoriteRouter);
 
 // home
 app.get("/", (req, res) => {

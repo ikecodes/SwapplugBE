@@ -33,6 +33,7 @@ module.exports = {
       price: req.body.price,
       fault: req.body.fault,
       expiryDate: req.body.expiryDate,
+      availableForTb: req.body.availableForTb,
       images: images,
       seller: req.user._id,
     });

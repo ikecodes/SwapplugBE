@@ -10,6 +10,10 @@ const productSchema = new mongoose.Schema(
     fault: String,
     expiryDate: Date,
     slug: String,
+    availableForTb: {
+      type: Boolean,
+      default: false,
+    },
     isSold: {
       type: Boolean,
       default: false,
@@ -29,6 +33,10 @@ const productSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+productSchema.pre("save", async function (next) {
+  this.slug = slugify(this.name, { lower: true });
+});
 
 const Product = mongoose.model("Product", productSchema);
 
