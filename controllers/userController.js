@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const User = require("../models/userModel");
+const Product = require("../models/productModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
 const createAndSendToken = require("../helpers/createAndSendToken");
@@ -29,6 +30,34 @@ module.exports = {
     res.status(200).json({
       status: "success",
       data: user,
+    });
+  }),
+
+  /**
+   * @function getUserStats
+   * @route /api/v1/users/getUserStats
+   * @method GET
+   */
+  getUserStats: catchAsync(async (req, res, next) => {
+    const stats = await Product.aggregate([
+      {
+        $match: { seller: req.user._id },
+      },
+      {
+        $group: {
+          _id: "$seller",
+          numberOfProducts: { $sum: 1 },
+          numberOfRatings: { $sum: "$ratingsQuantity" },
+          averageRating: { $avg: "$ratingsAverage" },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        stats,
+      },
     });
   }),
 

@@ -12,7 +12,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       require: [true, "Please tell us your last name"],
     },
-    gender: String,
+    gender: {
+      type: String,
+      enum: ["male", "female"],
+    },
     email: {
       type: String,
       required: [true, "Please provide your email"],
@@ -72,6 +75,11 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+    },
     emailConfirmToken: Number,
     passwordChangedAt: Date,
     passwordResetToken: Number,

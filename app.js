@@ -9,6 +9,7 @@ const userRouter = require("./routers/userRouter");
 const productRouter = require("./routers/productRouter");
 const orderRouter = require("./routers/orderRouter");
 const favoriteRouter = require("./routers/favoriteRouter");
+const reviewRouter = require("./routers/reviewRouter");
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/favorites", favoriteRouter);
+app.use("/api/v1/reviews", reviewRouter);
 
 // home
 app.get("/", (req, res) => {

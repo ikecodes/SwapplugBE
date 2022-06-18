@@ -14,6 +14,11 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    ratingsQuantity: Number,
+    ratingsAverage: {
+      type: Number,
+      default: 0,
+    },
     isSold: {
       type: Boolean,
       default: false,
@@ -31,8 +36,17 @@ const productSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+//  virtural populate
+productSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "product",
+  localField: "_id",
+});
 
 productSchema.pre("save", async function (next) {
   this.slug = slugify(this.name, { lower: true });
