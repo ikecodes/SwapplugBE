@@ -66,12 +66,12 @@ module.exports = {
    * @method POST
    */
   createReview: catchAsync(async (req, res, next) => {
-    // const alreadyReviewed = await Review.findOne({
-    //   user: req.user.id,
-    //   product: req.body.productId,
-    // });
-    // if (alreadyReviewed)
-    //   return next(new AppError("Product already reviewed by you", 403));
+    const alreadyReviewed = await Review.findOne({
+      user: req.user.id,
+      product: req.body.productId,
+    });
+    if (alreadyReviewed)
+      return next(new AppError("Product already reviewed by you", 403));
 
     const newReview = await Review.create({
       review: req.body.review,
