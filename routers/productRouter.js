@@ -4,13 +4,12 @@ const ProductController = require("../controllers/productController");
 const upload = require("../services/multer");
 const router = Router();
 
+router.use(auth);
 router.route("/").get(ProductController.getAllProducts);
 router
   .route("/getAllProductsByUser")
-  .get(auth, ProductController.getAllProductsByUser);
+  .get(ProductController.getAllProductsByUser);
 router.route("/:id").get(ProductController.getProduct);
-
-router.use(auth);
 router.route("/").post(upload.array("images"), ProductController.createProduct);
 router.route("/:id").delete(ProductController.deleteProduct);
 

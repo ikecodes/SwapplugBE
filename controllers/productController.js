@@ -1,4 +1,5 @@
 const Product = require("../models/productModel");
+const Favorite = require("../models/favoriteModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
 const APIFeatures = require("../helpers/apiFeatures");
@@ -63,16 +64,24 @@ module.exports = {
     const docPromise = products.query;
 
     const [count, doc] = await Promise.all([countPromise, docPromise]);
+    const favorites = await Favorite.find({ user: req.user._id }).select(
+      "product"
+    );
 
+    const filteredFavorites = favorites.map((favorite) => favorite.product.id);
+    const mainProducts = doc.map((product) =>
+      filteredFavorites.includes(product.id)
+        ? { ...product._doc, favorite: true }
+        : { ...product._doc, favorite: false }
+    );
     const pageCount = Math.ceil(count / 10);
-    // return console.log(doc);
     res.status(200).json({
       status: "success",
       pagination: {
         count,
         pageCount,
       },
-      data: doc,
+      data: mainProducts,
     });
   }),
   /**
@@ -101,10 +110,20 @@ module.exports = {
 
     if (!product)
       return next(new AppError("No product with this Id found", 404));
+    let favorite;
 
+    const isFavorite = await Favorite.findOne({
+      user: req.user.id,
+      product: req.params.id,
+    });
+    if (isFavorite) {
+      favorite = true;
+    } else {
+      favorite = false;
+    }
     res.status(200).json({
       status: "success",
-      data: product,
+      data: { ...product._doc, favorite },
     });
   }),
 

@@ -52,6 +52,15 @@ productSchema.pre("save", async function (next) {
   this.slug = slugify(this.name, { lower: true });
 });
 
+productSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "seller",
+    select: "-__v -passwordChangedAt",
+  });
+
+  next();
+});
+
 const Product = mongoose.model("Product", productSchema);
 
 module.exports = Product;
