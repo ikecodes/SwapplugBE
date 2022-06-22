@@ -142,7 +142,8 @@ module.exports = {
    * @method POST
    */
   getMe: catchAsync(async (req, res, next) => {
-    const user = await User.findOne({ id: req.user.id });
+    console.log(req.user);
+    const user = await User.findOne({ _id: req.user._id });
     if (!user) return next(new AppError("Please login to gain access", 403));
 
     res.status(200).json({
