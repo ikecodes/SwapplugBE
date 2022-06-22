@@ -32,7 +32,7 @@ module.exports = {
       name: req.body.name,
       category: req.body.category,
       price: req.body.price,
-      fault: req.body.fault,
+      faults: req.body.faults,
       expiryDate: req.body.expiryDate,
       availableForTb: req.body.availableForTb,
       images: images,
