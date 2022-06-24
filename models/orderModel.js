@@ -13,6 +13,15 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "Product",
     },
+    type: {
+      type: String,
+      enum: ["barter", "cash"],
+      default: "cash",
+    },
+    barterProduct: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Product",
+    },
     status: {
       type: String,
       enum: [

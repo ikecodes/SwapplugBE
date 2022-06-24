@@ -43,6 +43,7 @@ module.exports = {
       buyer: req.user.id,
       seller: req.body.sellerId,
       product: req.body.productId,
+      type: req.body.type,
     });
     if (alreadyInOrders)
       return next(new AppError("Product already in orders", 403));
@@ -51,6 +52,9 @@ module.exports = {
       buyer: req.user.id,
       seller: req.body.sellerId,
       product: req.body.productId,
+      type: req.body.type,
+      barterProduct: req.body.barterProduct,
+      status: "previewed",
     });
     res.status(200).json({
       status: "success",

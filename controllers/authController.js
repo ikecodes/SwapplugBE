@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const User = require("../models/userModel");
+const Wallet = require("../models/walletModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
 const createAndSendToken = require("../helpers/createAndSendToken");
@@ -31,6 +32,8 @@ module.exports = {
       password: req.body.password,
     });
 
+    // create wallet for new user
+    await Wallet.create({ userId: newUser._id });
     const token = newUser.createEmailConfirmToken();
     await newUser.save({ validateBeforeSave: false });
     const options = {
