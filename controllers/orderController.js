@@ -10,7 +10,7 @@ module.exports = {
    */
   getOutgoingOrders: catchAsync(async (req, res, next) => {
     const allOutgoingOrders = await Order.find({
-      buyer: req.user.id,
+      buyer: req.user._id,
     });
 
     res.status(200).json({
@@ -25,7 +25,7 @@ module.exports = {
    */
   getIncomingOrders: catchAsync(async (req, res, next) => {
     const allIncomingOrders = await Order.find({
-      seller: req.user.id,
+      seller: req.user._id,
     });
 
     res.status(200).json({
@@ -40,10 +40,9 @@ module.exports = {
    */
   createOrder: catchAsync(async (req, res, next) => {
     const alreadyInOrders = await Order.findOne({
-      buyer: req.user.id,
+      buyer: req.user._id,
       seller: req.body.sellerId,
       product: req.body.productId,
-      type: req.body.type,
     });
     if (alreadyInOrders)
       return next(new AppError("Product already in orders", 403));
@@ -69,16 +68,27 @@ module.exports = {
   updateOrder: catchAsync(async (req, res, next) => {
     const updatedOrder = await Order.findOneAndUpdate(
       {
-        buyer: req.user.id,
-        seller: req.body.sellerId,
-        product: req.body.productId,
+        _id: req.params.id,
+        buyer: req.user._id,
       },
-      { status: req.body.status },
+      req.body,
       { new: true }
     );
     res.status(200).json({
       status: "success",
       data: updatedOrder,
+    });
+  }),
+  /**
+   * @function deleteOrder
+   * @route /api/v1/orders
+   * @method DELETE
+   */
+  deleteOrder: catchAsync(async (req, res, next) => {
+    await Order.findByIdAndDelete(req.params.id);
+
+    res.status(204).json({
+      status: "success",
     });
   }),
 };

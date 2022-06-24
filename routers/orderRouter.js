@@ -9,6 +9,7 @@ router.use(auth);
 router.route("/getOutgoingOrders").get(orderController.getOutgoingOrders);
 router.route("/getIncomingOrders").get(orderController.getIncomingOrders);
 router.route("/").post(orderController.createOrder);
-router.route("/").patch(orderController.updateOrder);
+router.route("/:id").patch(orderController.updateOrder);
+router.route("/:id").delete(orderController.deleteOrder);
 
 module.exports = router;
