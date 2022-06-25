@@ -48,7 +48,6 @@ exports.getAccountDetails = async (details) => {
 };
 
 exports.intializeWithdraw = async (details) => {
-  console.log("///////////////yooooo", details.account_number);
   return new Promise(async (resolve, reject) => {
     try {
       const response = await flw.Transfer.initiate(details);
