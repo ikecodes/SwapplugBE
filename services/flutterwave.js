@@ -25,20 +25,33 @@ exports.getPayUrl = async (data) => {
   });
 };
 exports.verifyTransaction = async (transaction_id) => {
-  // const options = {
-  //   url: `https://api.flutterwave.com/v3/transactions/${transaction_id}/verify`,
-  //   headers: {
-  //     Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
-  //     "content-type": "application/json",
-  //   },
-  //   method: "GET",
-  // };
   return new Promise(async (resolve, reject) => {
     try {
       const response = await flw.Transaction.verify({
         id: transaction_id,
       });
-      // const response = await axios.request(options);
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+exports.getAccountDetails = async (details) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await flw.Misc.verify_Account(details);
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+exports.intializeWithdraw = async (details) => {
+  console.log("///////////////yooooo", details.account_number);
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await flw.Transfer.initiate(details);
       resolve(response);
     } catch (error) {
       reject(error);

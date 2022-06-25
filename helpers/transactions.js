@@ -1,6 +1,7 @@
 const Wallet = require("../models/walletModel");
 const WalletTransaction = require("../models/walletTransactionModel");
 const Transaction = require("../models/transactionModel");
+const Withdraw = require("../models/withdrawModel");
 // Get User wallet
 exports.getUserWallet = async (userId) => {
   return new Promise(async (resolve, reject) => {
@@ -39,24 +40,12 @@ exports.createWalletTransaction = async (
 };
 
 // Create Transaction
-exports.createTransaction = async (
-  userId,
-  id,
-  status,
-  currency,
-  amount,
-  customer
-) => {
+exports.createTransaction = async (userId, id, status, currency, amount) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // create transaction
-
       const transaction = await Transaction.create({
         userId,
         transactionId: id,
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone_number,
         amount,
         currency,
         paymentStatus: status,
@@ -68,13 +57,52 @@ exports.createTransaction = async (
     }
   });
 };
+// Create Withdraw
+exports.createWithDraw = async ({
+  userId,
+  transactionId,
+  accountNumber,
+  bankCode,
+  bankName,
+  amount,
+  currency,
+  narration,
+  transactionStatus,
+  transactionDate,
+  reference,
+}) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const withdraw = await Withdraw.create({
+        userId,
+        transactionId,
+        accountNumber,
+        bankCode,
+        bankName,
+        amount,
+        currency,
+        narration,
+        transactionStatus,
+        transactionDate,
+        reference,
+      });
+      resolve(withdraw);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 // Update wallet
-exports.updateWallet = async (userId, amount) => {
+exports.updateWallet = async (userId, amount, transactionType) => {
   return new Promise(async (resolve, reject) => {
     try {
       const wallet = await Wallet.findOne({ userId });
-      wallet.balance += amount;
+      if (transactionType === "fund") {
+        wallet.balance += amount;
+      } else {
+        wallet.balance -= amount;
+      }
       await wallet.save();
       resolve(wallet);
     } catch (error) {
