@@ -48,7 +48,7 @@ module.exports = {
       return next(new AppError("Product already in orders", 403));
 
     const newOrder = await Order.create({
-      buyer: req.user.id,
+      buyer: req.user._id,
       seller: req.body.sellerId,
       product: req.body.productId,
       type: req.body.type,
