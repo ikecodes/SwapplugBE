@@ -8,10 +8,12 @@ const orderSchema = new mongoose.Schema(
     seller: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
+      required: [true, "Specify seller Id"],
     },
     product: {
       type: mongoose.Schema.ObjectId,
       ref: "Product",
+      required: [true, "Specify buyer Id"],
     },
     type: {
       type: String,

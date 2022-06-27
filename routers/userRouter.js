@@ -17,6 +17,7 @@ router.route("/resetPassword").patch(AuthController.resetPassword);
 
 router.use(auth);
 router.route("/me").get(AuthController.getMe);
+router.route("/getUser/:id").get(AuthController.getUser);
 router.route("/getUserStats").get(UserController.getUserStats);
 router
   .route("/uploadId")

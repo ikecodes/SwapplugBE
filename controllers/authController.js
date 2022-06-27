@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const User = require("../models/userModel");
+const Product = require("../models/productModel");
 const Wallet = require("../models/walletModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
@@ -142,16 +143,63 @@ module.exports = {
   /**
    * @function me
    * @route /api/v1/users/getMe
-   * @method POST
+   * @method GET
    */
   getMe: catchAsync(async (req, res, next) => {
-    console.log(req.user);
     const user = await User.findOne({ _id: req.user._id });
     if (!user) return next(new AppError("Please login to gain access", 403));
 
+    const stats = await Product.aggregate([
+      {
+        $match: { seller: req.user._id },
+      },
+      {
+        $group: {
+          _id: "$seller",
+          numberOfProducts: { $sum: 1 },
+          numberOfRatings: { $sum: "$ratingsQuantity" },
+          averageRating: { $avg: "$ratingsAverage" },
+        },
+      },
+    ]);
+
     res.status(200).json({
       status: "success",
-      data: user,
+      data: {
+        ...user._doc,
+        stats,
+      },
+    });
+  }),
+  /**
+   * @function user
+   * @route /api/v1/users/getUser
+   * @method GET
+   */
+  getUser: catchAsync(async (req, res, next) => {
+    const user = await User.findOne({ _id: req.params.id });
+    if (!user) return next(new AppError("Please login to gain access", 403));
+
+    const stats = await Product.aggregate([
+      {
+        $match: { seller: req.params.id },
+      },
+      {
+        $group: {
+          _id: "$seller",
+          numberOfProducts: { $sum: 1 },
+          numberOfRatings: { $sum: "$ratingsQuantity" },
+          averageRating: { $avg: "$ratingsAverage" },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        ...user._doc,
+        stats,
+      },
     });
   }),
 
