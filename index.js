@@ -1,6 +1,7 @@
 const http = require("http");
 const app = require("./app");
 const db = require("./db/db");
+const agenda = require("./services/agenda");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -16,7 +17,10 @@ process.on("uncaughtException", (err) => {
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
   console.log(`App running on port ${port}...`);
+  // connect to database
   db();
+  // initialize agenda
+  agenda.start();
 });
 
 process.on("unhandledRejection", (err) => {

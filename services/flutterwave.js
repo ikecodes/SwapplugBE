@@ -24,6 +24,7 @@ exports.getPayUrl = async (data) => {
     }
   });
 };
+
 exports.verifyTransaction = async (transaction_id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -36,6 +37,27 @@ exports.verifyTransaction = async (transaction_id) => {
     }
   });
 };
+
+exports.getBanksInNg = async (data) => {
+  const options = {
+    url: "https://api.flutterwave.com/v3/banks/NG",
+    headers: {
+      Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+      "content-type": "application/json",
+    },
+    method: "GET",
+    data,
+  };
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios.request(options);
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 exports.getAccountDetails = async (details) => {
   return new Promise(async (resolve, reject) => {
     try {

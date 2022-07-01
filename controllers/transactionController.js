@@ -9,6 +9,7 @@ const {
   verifyTransaction,
   getAccountDetails,
   intializeWithdraw,
+  getBanksInNg,
 } = require("../services/flutterwave");
 const {
   getUserWallet,
@@ -17,11 +18,13 @@ const {
   updateWallet,
   createWithDraw,
 } = require("../helpers/transactions");
-const Flutterwave = require("flutterwave-node-v3");
-const flw = new Flutterwave(
-  process.env.FLW_PUBLIC_KEY,
-  process.env.FLW_SECRET_KEY
-);
+
+let BASE_URL = "";
+if (process.env.NODE_ENV === "development") {
+  BASE_URL = process.env.LOCAL_BASE_URL;
+} else {
+  BASE_URL = process.env.REMOTE_BASE_URL;
+}
 
 module.exports = {
   /**
@@ -35,7 +38,7 @@ module.exports = {
       phone_number: req.user.phone,
       name: `${req.user.firstName} ${req.user.lastName}`,
     };
-    const redirect_url = `${process.env.LOCAL_BASE_URL}/api/v1/transactions/paymentCallback`;
+    const redirect_url = `${BASE_URL}/api/v1/transactions/paymentCallback`;
     const tx_ref = "hooli---1920bboookt3333ytteedddey_fuckoff_ikeuu04440ee";
     const data = {
       ...req.body,
@@ -100,6 +103,19 @@ module.exports = {
     }
   }),
   /**
+   * @function getBanks
+   * @route /api/v1/transactions/getBanks
+   * @method GET
+   */
+  getBanks: catchAsync(async (req, res, next) => {
+    response = await getBanksInNg();
+
+    return res.status(200).json({
+      message: response.message,
+      data: response.data,
+    });
+  }),
+  /**
    * @function verifyAccountDetails
    * @route /api/v1/transactions/verifyAccountDetails
    * @method POST
@@ -136,7 +152,7 @@ module.exports = {
       amount: req.body.amount,
       narration: req.body.narration,
       currency: "NGN",
-      callback_url: `${process.env.LOCAL_BASE_URL}/api/v1/transactions/withdrawCallback`,
+      callback_url: `${BASE_URL}/api/v1/transactions/withdrawCallback`,
       debit_currency: "NGN",
     };
     // flw.Transfer.initiate(details).then(console.log).catch(console.log);

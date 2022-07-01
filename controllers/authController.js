@@ -31,10 +31,12 @@ module.exports = {
       phone: req.body.phone,
       address: req.body.address,
       password: req.body.password,
+      gender: req.body.gender,
     });
 
     // create wallet for new user
     await Wallet.create({ userId: newUser._id });
+
     const token = newUser.createEmailConfirmToken();
     await newUser.save({ validateBeforeSave: false });
     const options = {
@@ -135,6 +137,9 @@ module.exports = {
       return next(new AppError("please provide email and password!", 400));
     }
     const user = await User.findOne({ email }).select("+password");
+    if (user.emailConfirmToken)
+      return next(new AppError("please verify your email address", 401));
+
     if (!user || !(await user.correctPassword(password, user.password)))
       return next(new AppError("incorrect email or password!", 401));
 
@@ -169,6 +174,20 @@ module.exports = {
         ...user._doc,
         stats,
       },
+    });
+  }),
+  /**
+   * @function getWallet
+   * @route /api/v1/users/getWallet
+   * @method GET
+   */
+  getWallet: catchAsync(async (req, res, next) => {
+    const wallet = await Wallet.findOne({ userId: req.user._id });
+    if (!wallet) return next(new AppError("Please login to gain access", 403));
+
+    res.status(200).json({
+      status: "success",
+      data: wallet,
     });
   }),
   /**

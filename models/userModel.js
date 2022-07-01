@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: ["user", "admin"],
-      default: "admin",
+      default: "user",
     },
     password: {
       type: String,
@@ -56,10 +56,6 @@ const userSchema = new mongoose.Schema(
       default: 0,
     },
     reports: {
-      type: Number,
-      default: 0,
-    },
-    wallet: {
       type: Number,
       default: 0,
     },
@@ -89,8 +85,24 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+//  virtural populate
+// userSchema.virtual("wallet", {
+//   ref: "Wallet",
+//   foreignField: "userId",
+//   localField: "_id",
+// });
+
+// userSchema.pre(/^find/, function (next) {
+//   this.populate("wallet");
+//   next();
+// });
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();

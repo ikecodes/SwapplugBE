@@ -2,6 +2,7 @@ const Wallet = require("../models/walletModel");
 const WalletTransaction = require("../models/walletTransactionModel");
 const Transaction = require("../models/transactionModel");
 const Withdraw = require("../models/withdrawModel");
+const Payout = require("../models/payoutModel");
 // Get User wallet
 exports.getUserWallet = async (userId) => {
   return new Promise(async (resolve, reject) => {
@@ -106,6 +107,30 @@ exports.updateWallet = async (userId, amount, transactionType) => {
       await wallet.save();
       resolve(wallet);
     } catch (error) {
+      reject(error);
+    }
+  });
+};
+// Send money
+exports.sendMoney = async (payoutId, senderId, receiverId, amount) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const senderWallet = await Wallet.findOne({ userId: senderId });
+      senderWallet.balance -= amount;
+      await senderWallet.save();
+
+      const receiverWallet = await Wallet.findOne({ userId: receiverId });
+      receiverWallet.balance += amount;
+      await receiverWallet.save();
+
+      const payout = await Payout.findByIdAndUpdate(payoutId, {
+        status: "completed",
+      });
+      resolve(payout);
+    } catch (error) {
+      await Payout.findByIdAndUpdate(payoutId, {
+        status: "failed",
+      });
       reject(error);
     }
   });
