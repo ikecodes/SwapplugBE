@@ -190,37 +190,6 @@ module.exports = {
       data: wallet,
     });
   }),
-  /**
-   * @function user
-   * @route /api/v1/users/getUser
-   * @method GET
-   */
-  getUser: catchAsync(async (req, res, next) => {
-    const user = await User.findOne({ _id: req.params.id });
-    if (!user) return next(new AppError("Please login to gain access", 403));
-
-    const stats = await Product.aggregate([
-      {
-        $match: { seller: req.params.id },
-      },
-      {
-        $group: {
-          _id: "$seller",
-          numberOfProducts: { $sum: 1 },
-          numberOfRatings: { $sum: "$ratingsQuantity" },
-          averageRating: { $avg: "$ratingsAverage" },
-        },
-      },
-    ]);
-
-    res.status(200).json({
-      status: "success",
-      data: {
-        ...user._doc,
-        stats,
-      },
-    });
-  }),
 
   /**
    * @function forgotPassword

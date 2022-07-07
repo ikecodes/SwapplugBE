@@ -18,8 +18,7 @@ router.route("/resetPassword").patch(AuthController.resetPassword);
 router.use(auth);
 router.route("/me").get(AuthController.getMe);
 router.route("/getWallet").get(AuthController.getWallet);
-router.route("/getUser/:id").get(AuthController.getUser);
-router.route("/getUserStats").get(UserController.getUserStats);
+
 router
   .route("/uploadId")
   .patch(upload.single("identityCard"), AuthController.uploadId);
@@ -29,6 +28,8 @@ router
   .patch(upload.single("photo"), AuthController.updatePhoto);
 router.route("/updatePassword").patch(AuthController.updatePassword);
 
+router.route("/getUser/:id").get(UserController.getUser);
+router.route("/getUserStats").get(UserController.getUserStats);
 router.route("/followUser/:id").patch(UserController.followUser);
 router.route("/unfollowUser/:id").patch(UserController.unfollowUser);
 

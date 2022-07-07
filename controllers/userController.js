@@ -21,16 +21,38 @@ module.exports = {
     });
   }),
   /**
-   * @function getUser
-   * @route /api/v1/users/:id
+   * @function user
+   * @route /api/v1/users/getUser
    * @method GET
    */
   getUser: catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.params.id);
-    if (!user) return next(new AppError("No user with this Id found", 404));
+    const user = await User.findOne({ _id: req.params.id });
+    if (!user) return next(new AppError("Please login to gain access", 403));
+
+    const followsYou = user.following.includes(req.user._id);
+    const youFollow = user.followers.includes(req.user._id);
+    const stats = await Product.aggregate([
+      {
+        $match: { seller: req.params.id },
+      },
+      {
+        $group: {
+          _id: "$seller",
+          numberOfProducts: { $sum: 1 },
+          numberOfRatings: { $sum: "$ratingsQuantity" },
+          averageRating: { $avg: "$ratingsAverage" },
+        },
+      },
+    ]);
+
     res.status(200).json({
       status: "success",
-      data: user,
+      data: {
+        ...user._doc,
+        stats,
+        followsYou,
+        youFollow,
+      },
     });
   }),
 
