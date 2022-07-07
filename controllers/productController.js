@@ -85,13 +85,27 @@ module.exports = {
     });
   }),
   /**
+   * @function getAllProductsByMe
+   * @route /api/v1/products/getAllProductsByMe
+   * @method GET
+   */
+  getAllProductsByMe: catchAsync(async (req, res, next) => {
+    const products = await Product.find({
+      seller: req.user._id,
+    });
+    res.status(200).json({
+      status: "success",
+      data: products,
+    });
+  }),
+  /**
    * @function getAllProductsByUser
-   * @route /api/v1/products/getAllProductsByUser
+   * @route /api/v1/products/getAllProductsByUser/:id
    * @method GET
    */
   getAllProductsByUser: catchAsync(async (req, res, next) => {
     const products = await Product.find({
-      seller: req.user._id,
+      seller: req.params.id,
     });
     res.status(200).json({
       status: "success",
