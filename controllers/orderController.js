@@ -53,7 +53,7 @@ module.exports = {
       seller: req.body.sellerId,
       product: req.body.productId,
       type: req.body.type,
-      barterProduct: req.body.barterProduct,
+      swapProduct: req.body.swapProduct,
       status: "previewed",
     });
     res.status(200).json({

@@ -19,12 +19,10 @@ const orderSchema = new mongoose.Schema(
       type: String,
       enum: ["barter", "cash"],
     },
-    barterProduct: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: "Product",
-      },
-    ],
+    swapProduct: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Product",
+    },
     status: {
       type: String,
       enum: ["previewed", "inprogress", "swapped", "purchased", "declined"],
