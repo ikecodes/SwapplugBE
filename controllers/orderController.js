@@ -33,6 +33,7 @@ module.exports = {
       data: allIncomingOrders,
     });
   }),
+
   /**
    * @function createOrder
    * @route /api/v1/orders
@@ -89,6 +90,19 @@ module.exports = {
 
     res.status(204).json({
       status: "success",
+    });
+  }),
+  /**
+   * @function getOrder
+   * @route /api/v1/orders
+   * @method GET
+   */
+  getOrder: catchAsync(async (req, res, next) => {
+    const order = await Order.findById(req.params.id);
+
+    res.status(200).json({
+      status: "success",
+      data: order,
     });
   }),
 };

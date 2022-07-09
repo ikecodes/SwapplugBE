@@ -6,6 +6,7 @@ const router = Router();
 
 router.use(auth);
 
+router.route("/:id").get(orderController.getOrder);
 router.route("/getOutgoingOrders").get(orderController.getOutgoingOrders);
 router.route("/getIncomingOrders").get(orderController.getIncomingOrders);
 router.route("/").post(orderController.createOrder);
