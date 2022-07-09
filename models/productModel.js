@@ -11,8 +11,8 @@ const productSchema = new mongoose.Schema(
     expiryDate: Date,
     slug: String,
     availableForTb: {
-      type: Boolean,
-      default: false,
+      type: Number,
+      default: 1,
     },
     ratingsQuantity: Number,
     ratingsAverage: {
@@ -32,6 +32,16 @@ const productSchema = new mongoose.Schema(
     seller: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
+    },
+    swappableWith: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Product",
+      },
+    ],
+    quantity: {
+      type: Number,
+      default: 1,
     },
   },
   {

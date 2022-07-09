@@ -34,9 +34,11 @@ module.exports = {
       price: req.body.price,
       faults: req.body.faults,
       expiryDate: req.body.expiryDate,
-      availableForTb: req.body.availableForTb,
+      availableForSwap: req.body.availableForSwap,
       images: images,
       seller: req.user._id,
+      swappableWith: req.body.swappableWith,
+      quantity: req.body.quantity,
     });
 
     await User.findByIdAndUpdate(req.user.id, {
