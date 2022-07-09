@@ -18,7 +18,6 @@ const orderSchema = new mongoose.Schema(
     type: {
       type: String,
       enum: ["barter", "cash"],
-      default: "cash",
     },
     barterProduct: [
       {

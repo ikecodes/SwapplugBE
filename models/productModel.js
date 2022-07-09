@@ -10,7 +10,7 @@ const productSchema = new mongoose.Schema(
     faults: String,
     expiryDate: Date,
     slug: String,
-    availableForTb: {
+    availableForSwap: {
       type: Number,
       default: 1,
     },
