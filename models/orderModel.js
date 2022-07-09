@@ -27,7 +27,7 @@ const orderSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["previewed", "inprogress", "swapped", "purchased"],
+      enum: ["previewed", "inprogress", "swapped", "purchased", "declined"],
     },
   },
   {
