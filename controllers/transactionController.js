@@ -18,6 +18,7 @@ const {
   updateWallet,
   createWithDraw,
 } = require("../helpers/transactions");
+const { generateRef } = require("../helpers/generateRef");
 
 let BASE_URL = "";
 if (process.env.NODE_ENV === "development") {
@@ -39,7 +40,7 @@ module.exports = {
       name: `${req.user.firstName} ${req.user.lastName}`,
     };
     const redirect_url = `${BASE_URL}/api/v1/transactions/paymentCallback`;
-    const tx_ref = "hooli---1920bboookt3333ytteedddey_fuckoff_ikeuu04440ee";
+    const tx_ref = await generateRef(req.user._id);
     const data = {
       ...req.body,
       tx_ref,
@@ -98,7 +99,7 @@ module.exports = {
 
       return res.status(200).json({
         response: "wallet funded successfully",
-        data: wallet,
+        // data: wallet,
       });
     }
   }),

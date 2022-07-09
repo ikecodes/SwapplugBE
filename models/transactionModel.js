@@ -9,23 +9,6 @@ const transactionSchema = new mongoose.Schema(
       type: Number,
       trim: true,
     },
-    // name: {
-    //   type: String,
-    //   required: [true, "name is required"],
-    //   trim: true,
-    // },
-    // email: {
-    //   type: String,
-    //   required: [true, "email is required"],
-    //   trim: true,
-    // },
-    // phone: {
-    //   type: String,
-    // },
-    // amount: {
-    //   type: Number,
-    //   required: [true, "amount is required"],
-    // },
     currency: {
       type: String,
       required: [true, "currency is required"],
