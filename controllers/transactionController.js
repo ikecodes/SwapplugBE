@@ -141,7 +141,7 @@ module.exports = {
       currency: "NGN",
       callback_url: `${BASE_URL}/api/v1/transactions/withdrawCallback`,
       debit_currency: "NGN",
-      reference: "cscbjshvsxsxsj_PMCKDU_1",
+      // reference: "cscbjshvsxsxsj_PMCKDU_1",
     };
 
     const response = await intializeWithdraw(details);
