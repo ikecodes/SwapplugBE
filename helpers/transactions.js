@@ -1,5 +1,4 @@
 const Wallet = require("../models/walletModel");
-const WalletTransaction = require("../models/walletTransactionModel");
 const Transaction = require("../models/transactionModel");
 const Withdraw = require("../models/withdrawModel");
 const Payout = require("../models/payoutModel");
@@ -16,29 +15,28 @@ exports.getUserWallet = async (userId) => {
 };
 
 // Create Wallet Transaction
-exports.createWalletTransaction = async (
-  userId,
-  status,
-  isInflow,
-  currency,
-  amount
-) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      // create wallet transaction
-      const walletTransaction = await WalletTransaction.create({
-        amount,
-        userId,
-        isInflow,
-        currency,
-        status,
-      });
-      resolve(walletTransaction);
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
+// exports.createWalletTransaction = async (
+//   userId,
+//   status,
+//   isInflow,
+//   currency,
+//   amount
+// ) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       const walletTransaction = await WalletTransaction.create({
+//         amount,
+//         userId,
+//         isInflow,
+//         currency,
+//         status,
+//       });
+//       resolve(walletTransaction);
+//     } catch (error) {
+//       reject(error);
+//     }
+//   });
+// };
 
 // Create Transaction
 exports.createTransaction = async (userId, id, status, currency, amount) => {

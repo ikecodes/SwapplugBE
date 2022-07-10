@@ -5,7 +5,7 @@ const transactionController = require("../controllers/transactionController");
 const router = Router();
 
 router.route("/paymentCallback").get(transactionController.paymentCallback);
-router.route("/withdrawCallback").get(transactionController.withdrawCallback);
+router.route("/withdrawCallback").post(transactionController.withdrawCallback);
 
 router.use(auth);
 

@@ -1,6 +1,5 @@
 const User = require("../models/userModel");
-const Wallet = require("../models/walletModel");
-const WalletTransaction = require("../models/walletTransactionModel");
+const Withdraw = require("../models/withdrawModel");
 const Transaction = require("../models/transactionModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
@@ -13,7 +12,6 @@ const {
 } = require("../services/flutterwave");
 const {
   getUserWallet,
-  createWalletTransaction,
   createTransaction,
   updateWallet,
   createWithDraw,
@@ -63,9 +61,7 @@ module.exports = {
    * @method GET
    */
   paymentCallback: catchAsync(async (req, res, next) => {
-    const isInflow = true;
     const transactionType = "fund";
-
     if (req.query.status === "successful") {
       const { transaction_id } = req.query;
 
@@ -82,14 +78,6 @@ module.exports = {
       }
 
       const user = await User.findOne({ email: customer.email });
-
-      await createWalletTransaction(
-        user._id,
-        status,
-        isInflow,
-        currency,
-        amount
-      );
 
       await createTransaction(user._id, id, status, currency, amount);
 
@@ -138,9 +126,7 @@ module.exports = {
    * @method POST
    */
   initializeWithdraw: catchAsync(async (req, res, next) => {
-    const isInflow = false;
     const transactionType = "withdraw";
-
     const userWallet = await getUserWallet(req.user._id);
     if (userWallet.balance < req.body.amount)
       return next(
@@ -155,8 +141,8 @@ module.exports = {
       currency: "NGN",
       callback_url: `${BASE_URL}/api/v1/transactions/withdrawCallback`,
       debit_currency: "NGN",
+      reference: "cscbjshvsxsxsj_PMCKDU_1",
     };
-    // flw.Transfer.initiate(details).then(console.log).catch(console.log);
 
     const response = await intializeWithdraw(details);
 
@@ -187,14 +173,6 @@ module.exports = {
       reference: reference,
     };
 
-    await createWalletTransaction(
-      req.user._id,
-      status,
-      isInflow,
-      currency,
-      amount
-    );
-
     await createWithDraw(data);
 
     await updateWallet(req.user._id, amount, transactionType);
@@ -209,9 +187,30 @@ module.exports = {
   /**
    * @function withdrawCallback
    * @route /api/v1/transactions/withdrawCallback
-   * @method GET
+   * @method POST
    */
   withdrawCallback: catchAsync(async (req, res, next) => {
-    console.log("////////////////////CALLBACK", req.query);
+    const { data } = req.body;
+
+    console.log(data);
+    if (data.status === "SUCCESSFUL") {
+      const withdraw = await Withdraw.findOne({ transactionId: data.id });
+      withdraw.status = data.status;
+      withdraw.save();
+      return;
+    } else {
+      const transactionType = "fund";
+      const withdraw = await Withdraw.findOne({ transactionId: data.id });
+      withdraw.status = data.status;
+      withdraw.save();
+      await updateWallet(withdraw.userId, data.amount, transactionType);
+      return;
+    }
   }),
 };
+
+// const response = await flw.Transfer.fee({
+//   type: "account",
+//   amount: 2700,
+//   currency: "EUR",
+// });
