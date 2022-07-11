@@ -154,7 +154,7 @@ module.exports = {
 
       await updateWallet(req.user._id, amount, transactionType);
 
-      const wallet = await getUserWallet(user._id);
+      const wallet = await getUserWallet(req.user._id);
 
       return res.status(200).json({
         response: "wallet funded successfully",
