@@ -1,15 +1,15 @@
 const axios = require("axios");
 const Flutterwave = require("flutterwave-node-v3");
 const flw = new Flutterwave(
-  process.env.FLW_PUBLIC_KEY,
-  process.env.FLW_SECRET_KEY
+  process.env.TEST_FLW_PUBLIC_KEY,
+  process.env.TEST_FLW_SECRET_KEY
 );
 
 exports.getPayUrl = async (data) => {
   const options = {
     url: "https://api.flutterwave.com/v3/payments",
     headers: {
-      Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+      Authorization: `Bearer ${process.env.TEST_FLW_SECRET_KEY}`,
       "content-type": "application/json",
     },
     method: "POST",
@@ -42,7 +42,7 @@ exports.getBanksInNg = async (data) => {
   const options = {
     url: "https://api.flutterwave.com/v3/banks/NG",
     headers: {
-      Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+      Authorization: `Bearer ${process.env.TEST_FLW_SECRET_KEY}`,
       "content-type": "application/json",
     },
     method: "GET",
