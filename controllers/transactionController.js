@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const Withdraw = require("../models/withdrawModel");
+const Bank = require("../models/bankModel");
 const Transaction = require("../models/transactionModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
@@ -26,6 +27,35 @@ if (process.env.NODE_ENV === "development") {
 }
 
 module.exports = {
+  /**
+   * @function getBankDetails
+   * @route /api/v1/transactions/getBankDetails
+   * @method GET
+   */
+  getBankDetails: catchAsync(async (req, res, next) => {
+    const details = await Bank.findOne({ userId: req.user._id });
+
+    res.status(200).json({
+      status: "success",
+      data: details,
+    });
+  }),
+  /**
+   * @function addBankDetails
+   * @route /api/v1/transactions/addBankDetails
+   * @method POST
+   */
+  addBankDetails: catchAsync(async (req, res, next) => {
+    const details = await Bank.create({
+      userId: req.user._id,
+      ...req.body,
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: details,
+    });
+  }),
   /**
    * @function initializePayment
    * @route /api/v1/transactions/initializePayment
@@ -55,40 +85,83 @@ module.exports = {
       data: response.data,
     });
   }),
+  // /**
+  //  * @function paymentCallback
+  //  * @route /api/v1/transactions/paymentCallback
+  //  * @method GET
+  //  */
+  // paymentCallback: catchAsync(async (req, res, next) => {
+  //   const transactionType = "fund";
+  //   if (req.query.status === "successful") {
+  //     const { transaction_id } = req.query;
+
+  //     const response = await verifyTransaction(transaction_id);
+
+  //     const { status, currency, id, amount, customer } = response.data;
+
+  //     const transactionExist = await Transaction.findOne({
+  //       transactionId: id,
+  //       userId: req.user._id
+  //     });
+
+  //     if (transactionExist) {
+  //       return next(new AppError("Transaction already exist", 409));
+  //     }
+
+  //     const user = await User.findOne({ email: customer.email });
+
+  //     await createTransaction(user._id, id, status, currency, amount);
+
+  //     await updateWallet(user._id, amount, transactionType);
+
+  //     const wallet = await getUserWallet(user._id);
+
+  //     return res.status(200).json({
+  //       response: "wallet funded successfully",
+  //       data: wallet,
+  //     });
+  //   }
+  // }),
   /**
-   * @function paymentCallback
-   * @route /api/v1/transactions/paymentCallback
-   * @method GET
+   * @function verifyPaymemnt
+   * @route /api/v1/transactions/verifyPaymemnt
+   * @method POST
    */
-  paymentCallback: catchAsync(async (req, res, next) => {
+  verifyPayment: catchAsync(async (req, res, next) => {
     const transactionType = "fund";
-    if (req.query.status === "successful") {
-      const { transaction_id } = req.query;
 
-      const response = await verifyTransaction(transaction_id);
+    const { transaction_id } = req.body;
 
-      const { status, currency, id, amount, customer } = response.data;
+    const response = await verifyTransaction(transaction_id);
+    if (response.status === "error")
+      return next(new AppError("No transaction was found for this id", 404));
 
+    const { status, currency, id, amount } = response.data;
+
+    if (status === "successful") {
       const transactionExist = await Transaction.findOne({
         transactionId: id,
+        userId: req.user._id,
       });
 
       if (transactionExist) {
         return next(new AppError("Transaction already exist", 409));
       }
 
-      const user = await User.findOne({ email: customer.email });
+      // const user = await User.findOne({ email: customer.email });
 
-      await createTransaction(user._id, id, status, currency, amount);
+      await createTransaction(req.user._id, id, status, currency, amount);
 
-      await updateWallet(user._id, amount, transactionType);
+      await updateWallet(req.user._id, amount, transactionType);
 
       const wallet = await getUserWallet(user._id);
 
       return res.status(200).json({
         response: "wallet funded successfully",
-        // data: wallet,
+        data: wallet,
       });
+    } else {
+      return next(new AppError("transaction unsuccessful", "400"));
     }
   }),
   /**
