@@ -7,36 +7,18 @@ exports.getUserWallet = async (userId) => {
   return new Promise(async (resolve, reject) => {
     try {
       const userWallet = await Wallet.findOne({ userId });
+      if (!userWallet) {
+        const wallet = await Wallet.create({
+          userId,
+        });
+        resolve(wallet);
+      }
       resolve(userWallet);
     } catch (error) {
       reject(error);
     }
   });
 };
-
-// Create Wallet Transaction
-// exports.createWalletTransaction = async (
-//   userId,
-//   status,
-//   isInflow,
-//   currency,
-//   amount
-// ) => {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const walletTransaction = await WalletTransaction.create({
-//         amount,
-//         userId,
-//         isInflow,
-//         currency,
-//         status,
-//       });
-//       resolve(walletTransaction);
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// };
 
 // Create Transaction
 exports.createTransaction = async (userId, id, status, currency, amount) => {
@@ -96,7 +78,7 @@ exports.createWithDraw = async ({
 exports.updateWallet = async (userId, amount, transactionType) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const wallet = await Wallet.findOne({ userId });
+      const wallet = await this.getUserWallet(userId);
       if (transactionType === "fund") {
         wallet.balance += amount;
       } else {

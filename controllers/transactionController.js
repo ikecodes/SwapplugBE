@@ -148,8 +148,6 @@ module.exports = {
         return next(new AppError("Transaction already exist", 409));
       }
 
-      // const user = await User.findOne({ email: customer.email });
-
       await createTransaction(req.user._id, id, status, currency, amount);
 
       await updateWallet(req.user._id, amount, transactionType);
