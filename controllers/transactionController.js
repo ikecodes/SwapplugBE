@@ -263,7 +263,6 @@ module.exports = {
   withdrawCallback: catchAsync(async (req, res, next) => {
     const { data } = req.body;
 
-    console.log(data);
     if (data.status === "SUCCESSFUL") {
       const withdraw = await Withdraw.findOne({ transactionId: data.id });
       withdraw.status = data.status;

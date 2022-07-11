@@ -70,8 +70,9 @@ module.exports = {
     const senderId = req.user._id;
     const receiverId = req.body.sellerId;
     const amount = req.body.amount;
+    const duration = req.body.duration;
 
-    await agenda.schedule("in 1 minutes", "send money", {
+    await agenda.schedule(`in ${duration} minutes`, "send money", {
       payoutId,
       senderId,
       receiverId,
