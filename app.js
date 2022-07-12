@@ -12,6 +12,7 @@ const favoriteRouter = require("./routers/favoriteRouter");
 const reviewRouter = require("./routers/reviewRouter");
 const transactionRouter = require("./routers/transactionRouter");
 const payoutRouter = require("./routers/payoutRouter");
+const bankRouter = require("./routers/bankRouter");
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use("/api/v1/favorites", favoriteRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/transactions", transactionRouter);
 app.use("/api/v1/payouts", payoutRouter);
+app.use("/api/v1/banks", bankRouter);
 
 // home
 app.get("/", (req, res) => {

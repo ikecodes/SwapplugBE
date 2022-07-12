@@ -11,9 +11,13 @@ router.use(auth);
 
 // get bank details
 router.route("/getBankDetails").get(transactionController.getBankDetails);
-
 // add bank details
 router.route("/addBankDetails").post(transactionController.addBankDetails);
+// add bank details
+router
+  .route("/deleteBankDetails/:id")
+  .delete(transactionController.deleteBankDetails);
+
 // intialize payment
 router
   .route("/initializePayment")
