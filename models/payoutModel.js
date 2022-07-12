@@ -20,6 +20,11 @@ const payoutSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    duration: {
+      type: Number,
+      enum: [3, 5, 7],
+      default: 3,
+    },
     status: {
       type: String,
       enum: ["pending", "completed", "failed"],

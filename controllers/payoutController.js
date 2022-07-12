@@ -64,6 +64,7 @@ module.exports = {
       seller: req.body.sellerId,
       product: req.body.productId,
       amount: req.body.amount,
+      duration: req.body.duration,
     });
 
     const payoutId = newPayout._id;
