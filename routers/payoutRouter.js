@@ -8,6 +8,7 @@ router.use(auth);
 
 router.route("/getOutgoingPayouts").get(payoutController.getOutgoingPayouts);
 router.route("/getIncomingPayouts").get(payoutController.getIncomingPayouts);
+router.route("/getPayout/:id").get(payoutController.getPayout);
 router.route("/").post(payoutController.createPayout);
 router.route("/:id").patch(payoutController.updatePayout);
 

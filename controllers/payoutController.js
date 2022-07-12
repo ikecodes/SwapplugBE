@@ -106,4 +106,17 @@ module.exports = {
       data: updatedPayout,
     });
   }),
+  /**
+   * @function getPayout
+   * @route /api/v1/payouts/getPayout/:id
+   * @method GET
+   */
+  getPayout: catchAsync(async (req, res, next) => {
+    const payout = await Payout.findById(req.params.id);
+    if (!payout) return next(new AppError("No payout with this Id found", 404));
+    res.status(200).json({
+      status: "success",
+      data: payout,
+    });
+  }),
 };
