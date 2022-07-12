@@ -1,6 +1,4 @@
-const User = require("../models/userModel");
 const Withdraw = require("../models/withdrawModel");
-const Bank = require("../models/bankModel");
 const Transaction = require("../models/transactionModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
@@ -28,49 +26,31 @@ if (process.env.NODE_ENV === "development") {
 
 module.exports = {
   /**
-   * @function getBankDetails
-   * @route /api/v1/transactions/getBankDetails
+   * @function getAllTransactions
+   * @route /api/v1/transactions/getAllTransactions
    * @method GET
    */
-  getBankDetails: catchAsync(async (req, res, next) => {
-    const details = await Bank.find({ userId: req.user._id });
-    if (!details.length)
-      return next(new AppError("you have not added any bank detail"));
-    res.status(200).json({
-      status: "success",
-      data: details,
-    });
-  }),
-  /**
-   * @function addBankDetails
-   * @route /api/v1/transactions/addBankDetails
-   * @method POST
-   */
-  addBankDetails: catchAsync(async (req, res, next) => {
-    const alreadyAdded = await Bank.findOne({
-      accountNumber: req.body.accountNumber,
-    });
-    if (alreadyAdded)
-      return next(new AppError("this bank details has already been added"));
-    const details = await Bank.create({
+  getAllTransactions: catchAsync(async (req, res, next) => {
+    const getAllTransactions = await Transaction.find({
       userId: req.user._id,
-      ...req.body,
     });
-
     res.status(200).json({
       status: "success",
-      data: details,
+      data: getAllTransactions,
     });
   }),
   /**
-   * @function deleteBankDetails
-   * @route /api/v1/transactions/deleteBankDetails/:id
-   * @method DELETE
+   * @function getTransaction
+   * @route /api/v1/transactions/getTransaction/:id
+   * @method GET
    */
-  deleteBankDetails: catchAsync(async (req, res, next) => {
-    await Bank.findByIdAndDelete(req.params.id);
-    res.status(204).json({
+  getTransaction: catchAsync(async (req, res, next) => {
+    const getTransaction = await Transaction.findById(req.params.id);
+    if (!getTransaction)
+      return next(new AppError("no transaction with this Id found", 404));
+    res.status(200).json({
       status: "success",
+      data: getTransaction,
     });
   }),
   /**
@@ -293,6 +273,34 @@ module.exports = {
       await updateWallet(withdraw.userId, data.amount, transactionType);
       return;
     }
+  }),
+  /**
+   * @function getAllWithdrawals
+   * @route /api/v1/transactions/getAllWithdrawals
+   * @method GET
+   */
+  getAllWithdrawals: catchAsync(async (req, res, next) => {
+    const getAllWithdrawals = await Withdraw.find({
+      userId: req.user._id,
+    });
+    res.status(200).json({
+      status: "success",
+      data: getAllWithdrawals,
+    });
+  }),
+  /**
+   * @function getWithdrawal
+   * @route /api/v1/transactions/getWithdrawal/:id
+   * @method GET
+   */
+  getWithdrawal: catchAsync(async (req, res, next) => {
+    const getWithdrawal = await Withdraw.findById(req.params.id);
+    if (!getWithdrawal)
+      return next(new AppError("no withdraw with this Id found", 404));
+    res.status(200).json({
+      status: "success",
+      data: getWithdrawal,
+    });
   }),
 };
 

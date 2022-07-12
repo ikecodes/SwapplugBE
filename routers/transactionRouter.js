@@ -9,14 +9,13 @@ router.route("/withdrawCallback").post(transactionController.withdrawCallback);
 
 router.use(auth);
 
-// get bank details
-router.route("/getBankDetails").get(transactionController.getBankDetails);
-// add bank details
-router.route("/addBankDetails").post(transactionController.addBankDetails);
-// add bank details
+// get all transactions
 router
-  .route("/deleteBankDetails/:id")
-  .delete(transactionController.deleteBankDetails);
+  .route("/getAllTransactions")
+  .get(transactionController.getAllTransactions);
+
+// get transaction
+router.route("/getTransaction/:id").get(transactionController.getTransaction);
 
 // intialize payment
 router
@@ -38,5 +37,10 @@ router
 router
   .route("/initializeWithdraw")
   .post(transactionController.initializeWithdraw);
+
+// get all withdrawals
+router.route("/getAllWithdrawals").get(transactionController.getAllWithdrawals);
+// get withdrawal
+router.route("/getWithdrawal/:id").get(transactionController.getWithdrawal);
 
 module.exports = router;
