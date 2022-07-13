@@ -36,6 +36,7 @@ module.exports = {
       expiryDate: req.body.expiryDate,
       availableForSwap: req.body.availableForSwap,
       images: images,
+      durationUsed: req.body.durationUsed,
       seller: req.user._id,
       swappableWith: req.body.swappableWith,
       quantity: req.body.quantity,
@@ -140,6 +141,24 @@ module.exports = {
     res.status(200).json({
       status: "success",
       data: { ...product._doc, favorite },
+    });
+  }),
+  /**
+   * @function editProduct
+   * @route /api/v1/products/:id
+   * @method PATCH
+   */
+  editProduct: catchAsync(async (req, res, next) => {
+    const newProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+      }
+    );
+    res.status(200).json({
+      status: "success",
+      data: newProduct,
     });
   }),
 

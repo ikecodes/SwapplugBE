@@ -9,6 +9,7 @@ const productSchema = new mongoose.Schema(
     price: Number,
     faults: String,
     expiryDate: Date,
+    durationUsed: String,
     slug: String,
     availableForSwap: {
       type: Number,
