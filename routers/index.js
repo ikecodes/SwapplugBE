@@ -8,6 +8,8 @@ const transactionRouter = require("./transactionRouter");
 const payoutRouter = require("./payoutRouter");
 const bankRouter = require("./bankRouter");
 const tokenRouter = require("./tokenRouter");
+const conversationRouter = require("./conversationRouter");
+const messageRouter = require("./messageRouter");
 
 const router = Router();
 
@@ -20,5 +22,7 @@ router.use("/transactions", transactionRouter);
 router.use("/payouts", payoutRouter);
 router.use("/banks", bankRouter);
 router.use("/tokens", tokenRouter);
+router.use("/conversations", conversationRouter);
+router.use("/messages", messageRouter);
 
 module.exports = router;
