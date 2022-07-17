@@ -7,6 +7,10 @@ const conversationSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    orderId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Order",
+    },
   },
   {
     timestamps: true,
@@ -17,7 +21,7 @@ conversationSchema.pre(/^find/, function (next) {
   this.populate({
     path: "members",
     select: "photo firstName lastName",
-  });
+  }).populate("orderId");
 
   next();
 });

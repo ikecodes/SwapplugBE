@@ -10,6 +10,7 @@ module.exports = {
   createConversation: catchAsync(async (req, res, next) => {
     const newConversation = await Conversation.create({
       members: [req.user._id, req.body.receiverId],
+      orderId: req.body.orderId,
     });
     res.status(200).json({
       status: "success",
