@@ -1,6 +1,8 @@
 const Order = require("../models/orderModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
+const Token = require("../models/tokenModel");
+const FireBaseService = require("../services/firebase");
 
 module.exports = {
   /**
@@ -31,6 +33,34 @@ module.exports = {
     res.status(200).json({
       status: "success",
       data: allIncomingOrders,
+    });
+  }),
+  /**
+   * @function sendNotification
+   * @route /api/v1/orders/sendNotification
+   * @method POST
+   */
+  sendNotification: catchAsync(async (req, res, next) => {
+    const savedAccountToken = await Token.findOne({
+      userId: req.body.sellerId,
+    });
+
+    const fcmData = {
+      type: "text",
+      message: req.body.message,
+      time: `${Date.now()}`,
+    };
+    const fcmDeviceToken = savedAccountToken.fcmToken;
+
+    const fcmNotification = {
+      title: "New message",
+      body: req.body.message,
+    };
+
+    FireBaseService.sendSingleMessage(fcmDeviceToken, fcmData, fcmNotification);
+
+    res.status(200).json({
+      status: "success",
     });
   }),
 

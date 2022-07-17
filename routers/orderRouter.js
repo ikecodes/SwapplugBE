@@ -9,6 +9,7 @@ router.use(auth);
 router.route("/getOrder/:id").get(orderController.getOrder);
 router.route("/getOutgoingOrders").get(orderController.getOutgoingOrders);
 router.route("/getIncomingOrders").get(orderController.getIncomingOrders);
+router.route("/sendNotification").post(orderController.sendNotification);
 router.route("/").post(orderController.createOrder);
 router.route("/:id").patch(orderController.updateOrder);
 router.route("/:id").delete(orderController.deleteOrder);
