@@ -13,4 +13,3 @@ login.sh
 src/config/firebase-config.json
 .DS_Store
 yarn.lock
-firebase-config.json
