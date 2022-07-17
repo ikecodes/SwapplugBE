@@ -30,13 +30,15 @@ module.exports = {
     if (req.body.type === "text") {
       fcmData = {
         type: req.body.type,
-        message: req.body.message,
+        receiverId: req.body.receiverId,
+        content: req.body.message,
         time: `${Date.now()}`,
       };
     } else {
       fcmData = {
         type: req.body.type,
-        imageUrl: req.body.imageUrl,
+        receiverId: req.body.receiverId,
+        content: req.body.imageUrl,
         time: `${Date.now()}`,
       };
     }
@@ -60,7 +62,7 @@ module.exports = {
    */
   getAllMessages: catchAsync(async (req, res, next) => {
     const messages = await Message.find({
-      conversationId: req.params.id,
+      orderId: req.params.id,
     });
     res.status(200).json({
       status: "success",
