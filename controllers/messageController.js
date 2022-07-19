@@ -20,28 +20,18 @@ module.exports = {
 
     const newMessage = await Message.create({
       conversationId: req.body.conversationId,
+      orderId: req.body.orderId,
       senderId: req.user._id,
       type: req.body.type,
       message: req.body.message,
-      imageUrl: req.body.imageUrl,
     });
 
-    let fcmData;
-    if (req.body.type === "text") {
-      fcmData = {
-        type: req.body.type,
-        receiverId: req.body.receiverId,
-        content: req.body.message,
-        time: `${Date.now()}`,
-      };
-    } else {
-      fcmData = {
-        type: req.body.type,
-        receiverId: req.body.receiverId,
-        content: req.body.imageUrl,
-        time: `${Date.now()}`,
-      };
-    }
+    const fcmData = {
+      type: req.body.type,
+      receiverId: req.body.receiverId,
+      message: req.body.message,
+      time: `${Date.now()}`,
+    };
 
     const fcmNotification = {
       title: "New message",

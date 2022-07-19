@@ -9,14 +9,15 @@ const messageSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
+    orderId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Order",
+    },
     type: {
       type: String,
       enum: ["text", "image"],
     },
     message: {
-      type: String,
-    },
-    imageUrl: {
       type: String,
     },
   },
