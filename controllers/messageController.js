@@ -29,7 +29,7 @@ module.exports = {
     const fcmData = {
       type: req.body.type,
       receiverId: req.body.receiverId,
-      senderId: req.body.senderId,
+      senderId: req.user._id.toString(),
       message: req.body.message,
       time: `${Date.now()}`,
     };
