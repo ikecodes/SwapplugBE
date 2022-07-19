@@ -9,6 +9,9 @@ const transactionSchema = new mongoose.Schema(
       type: Number,
       trim: true,
     },
+    amount: {
+      type: Number,
+    },
     currency: {
       type: String,
       required: [true, "currency is required"],
