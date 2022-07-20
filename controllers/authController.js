@@ -7,6 +7,7 @@ const AppError = require("../helpers/appError");
 const createAndSendToken = require("../helpers/createAndSendToken");
 const Mail = require("../helpers/sendEmail");
 const cloudinary = require("../services/cloudinary");
+const { generateReferralCode } = require("../helpers/generateRef");
 
 module.exports = {
   /**
@@ -119,6 +120,7 @@ module.exports = {
       return next(new AppError("token is invalid or has expired", 400));
     }
     user.emailConfirmToken = undefined;
+    user.referalCode = await generateReferralCode();
     await user.save();
     res.status(200).json({
       status: "success",

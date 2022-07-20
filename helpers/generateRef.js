@@ -1,9 +1,25 @@
+const User = require("../models/userModel");
 const xid = require("xid");
 
 exports.generateRef = async (id) => {
   //generate new key
-  let UAK = "SWP-" + xid.generateId() + id;
-  return UAK;
+  let TREF = "SWP-" + xid.generateId() + id;
+  return TREF;
+};
+exports.generateReferralCode = async () => {
+  //generate new key
+  let CODE = "USP-" + xid.generateId();
+
+  //check for clashes & regenerate
+  let clashingAccount = await User.findOne({ referalCode: CODE });
+  if (clashingAccount) {
+    while (true) {
+      CODE = "USP-" + xid.generateId();
+      clashingAccount = await User.findOne({ referalCode: CODE });
+      if (!clashingAccount) break;
+    }
+  }
+  return CODE;
 };
 
 // exports.generateRef = async () => {

@@ -58,6 +58,10 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    referalCode: {
+      type: String,
+      default: "nill",
+    },
     followers: [
       {
         type: mongoose.Schema.ObjectId,
@@ -75,7 +79,10 @@ const userSchema = new mongoose.Schema(
       min: 1,
       max: 5,
     },
-    emailConfirmToken: Number,
+    emailConfirmToken: {
+      type: Number,
+      select: false,
+    },
     passwordChangedAt: Date,
     passwordResetToken: Number,
     passwordResetExpires: Date,
