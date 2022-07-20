@@ -11,11 +11,11 @@ exports.generateReferralCode = async () => {
   let CODE = "USP-" + xid.generateId();
 
   //check for clashes & regenerate
-  let clashingAccount = await User.findOne({ referalCode: CODE });
+  let clashingAccount = await User.findOne({ referralCode: CODE });
   if (clashingAccount) {
     while (true) {
       CODE = "USP-" + xid.generateId();
-      clashingAccount = await User.findOne({ referalCode: CODE });
+      clashingAccount = await User.findOne({ referralCode: CODE });
       if (!clashingAccount) break;
     }
   }
