@@ -33,6 +33,7 @@ module.exports = {
       address: req.body.address,
       password: req.body.password,
       gender: req.body.gender,
+      referrer: req.body.referrer,
     });
 
     // create wallet for new user
