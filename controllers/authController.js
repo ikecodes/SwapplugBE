@@ -121,7 +121,7 @@ module.exports = {
       return next(new AppError("token is invalid or has expired", 400));
     }
     user.emailConfirmToken = undefined;
-    user.referralCode = await generateReferralCode();
+    user.referralId = await generateReferralCode();
     await user.save();
     res.status(200).json({
       status: "success",

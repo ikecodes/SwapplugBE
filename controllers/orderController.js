@@ -1,6 +1,9 @@
 const Order = require("../models/orderModel");
+const Notification = require("../models/notificationModel");
+const Token = require("../models/tokenModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
+const FireBaseService = require("../services/firebase");
 
 module.exports = {
   /**
@@ -40,6 +43,9 @@ module.exports = {
    * @method POST
    */
   createOrder: catchAsync(async (req, res, next) => {
+    const title = "New trade";
+    const message = `${req.user.firstName} ${req.user.lastName} wants to make a trade`;
+
     const alreadyInOrders = await Order.findOne({
       buyer: req.user._id,
       seller: req.body.sellerId,
@@ -56,6 +62,31 @@ module.exports = {
       swapProduct: req.body.swapProduct,
       status: "previewed",
     });
+
+    const savedAccountToken = await Token.findOne({
+      userId: req.body.sellerId,
+    });
+
+    await Notification.create({
+      userId: req.body.sellerId,
+      orderId: newOrder._id.toString(),
+      title,
+      message,
+    });
+
+    const fcmData = {
+      type: "text",
+      message,
+      time: `${Date.now()}`,
+    };
+    const fcmDeviceToken = savedAccountToken.fcmToken;
+
+    const fcmNotification = {
+      title,
+      body: message,
+    };
+
+    FireBaseService.sendSingleMessage(fcmDeviceToken, fcmData, fcmNotification);
     res.status(200).json({
       status: "success",
       data: newOrder,
