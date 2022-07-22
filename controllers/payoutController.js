@@ -67,23 +67,26 @@ module.exports = {
       );
 
     // lets know the status to give the order when payment is completed
-    let statusToBeUpdated;
+    let newOrderStatus;
     if (order.type === "cash") {
-      statusToBeUpdated = "purchased";
+      newOrderStatus = "purchased";
     } else {
-      statusToBeUpdated = "swapped";
+      newOrderStatus = "swapped";
     }
     // create a payout which will be in pending state first
+    const amountToBeSent = req.body.amount - req.body.fee;
+
     const newPayout = await Payout.create({
       order: req.body.orderId,
-      amount: req.body.amount,
+      amount: amountToBeSent,
+      fee: req.body.fee,
       duration: req.body.duration,
     });
 
     const payoutId = newPayout._id;
     const senderId = req.user._id;
     const receiverId = order.seller._id;
-    const amount = req.body.amount;
+    const amountToBeDebited = req.body.amount;
     const duration = req.body.duration;
     const orderId = req.body.orderId;
 
@@ -91,9 +94,10 @@ module.exports = {
       payoutId,
       senderId,
       receiverId,
-      amount,
+      amountToBeDebited,
       orderId,
-      statusToBeUpdated,
+      newOrderStatus,
+      amountToBeSent,
     });
     res.status(200).json({
       status: "success",

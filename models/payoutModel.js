@@ -4,9 +4,15 @@ const payoutSchema = new mongoose.Schema(
     order: {
       type: mongoose.Schema.ObjectId,
       ref: "Order",
+      required: [true, "order Id for this payout is required"],
     },
     amount: {
       type: Number,
+      required: [true, "amount for this payout is required"],
+    },
+    fee: {
+      type: Number,
+      required: [true, "fee for this payout is required"],
     },
     transfer: {
       type: Boolean,

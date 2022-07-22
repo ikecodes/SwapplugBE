@@ -201,10 +201,12 @@ module.exports = {
         new AppError("You do not have enough balance to make withdrawal", 403)
       );
 
+    // remove 45 naira flutterwave fee
+    const amountToBeDebited = req.body.amount - 45;
     const details = {
       account_bank: req.body.accountBank,
       account_number: req.body.accountNumber,
-      amount: req.body.amount,
+      amount: amountToBeDebited,
       narration: req.body.narration,
       currency: "NGN",
       callback_url: `${BASE_URL}/api/v1/transactions/withdrawCallback`,

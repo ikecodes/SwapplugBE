@@ -97,25 +97,30 @@ exports.sendMoney = async (
   payoutId,
   senderId,
   receiverId,
-  amount,
+  amountToBeDebited,
   orderId,
-  statusToBeUpdated
+  newOrderStatus,
+  amountToBeSent
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
       const payout = await Payout.findById(payoutId);
       if (payout.transfer === true) {
         const senderWallet = await Wallet.findOne({ userId: senderId });
-        senderWallet.balance -= amount;
+        senderWallet.balance -= amountToBeDebited;
         await senderWallet.save();
 
         const receiverWallet = await Wallet.findOne({ userId: receiverId });
-        receiverWallet.balance += amount;
+        receiverWallet.balance += amountToBeSent;
         await receiverWallet.save();
 
-        payout.status === "completed";
-        payout.save();
-        await Order.findByIdAndUpdate(orderId, { status: statusToBeUpdated });
+        const payoutPromise = Payout.findByIdAndUpdate(payoutId, {
+          status: "completed",
+        });
+        const orderPromise = Order.findByIdAndUpdate(orderId, {
+          status: newOrderStatus,
+        });
+        await Promise.all([payoutPromise, orderPromise]);
       } else {
         console.log("no transfer ");
       }

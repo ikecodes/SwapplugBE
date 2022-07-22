@@ -19,18 +19,20 @@ agenda.define(
       payoutId,
       senderId,
       receiverId,
-      amount,
+      amountToBeDebited,
       orderId,
-      statusToBeUpdated,
+      newOrderStatus,
+      amountToBeSent,
     } = job.attrs.data;
     try {
       await sendMoney(
         payoutId,
         senderId,
         receiverId,
-        amount,
+        amountToBeDebited,
         orderId,
-        statusToBeUpdated
+        newOrderStatus,
+        amountToBeSent
       );
     } catch (error) {
       console.log(error);
