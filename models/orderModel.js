@@ -13,11 +13,12 @@ const orderSchema = new mongoose.Schema(
     product: {
       type: mongoose.Schema.ObjectId,
       ref: "Product",
-      required: [true, "Specify buyer Id"],
+      required: [true, "Specify order Id"],
     },
     type: {
       type: String,
-      enum: ["barter", "cash"],
+      enum: ["swap", "cash"],
+      required: [true, "Order must have a type of swap or cash"],
     },
     swapProduct: {
       type: mongoose.Schema.ObjectId,

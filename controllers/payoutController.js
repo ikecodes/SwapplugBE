@@ -1,5 +1,6 @@
 const Wallet = require("../models/walletModel");
 const Payout = require("../models/payoutModel");
+const Order = require("../models/orderModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
 const { transferCash } = require("../services/agenda");
@@ -40,16 +41,23 @@ module.exports = {
    * @method POST
    */
   createPayout: catchAsync(async (req, res, next) => {
+    const order = await Order.findById(req.body.orderId);
+
+    // check if order has already been paid for
     const alreadyPaid = await Payout.findOne({
       buyer: req.user._id,
-      seller: req.body.sellerId,
-      product: req.body.productId,
+      seller: order.seller,
+      order: req.body.orderId,
     });
     if (alreadyPaid)
       return next(new AppError("Product has already been paid for", 403));
 
-    const senderWallet = await Wallet.findOne({ userId: req.user._id });
+    // check if this is the buyers order
+    if (req.user._id.toString() !== order.buyer._id.toString())
+      return next(new AppError("This order does not belong to you", 404));
 
+    // get senders wallet and check for balance
+    const senderWallet = await Wallet.findOne({ userId: req.user._id });
     if (senderWallet.balance < parseInt(req.body.amount))
       return next(
         new AppError(
@@ -58,26 +66,34 @@ module.exports = {
         )
       );
 
+    // lets know the status to give the order when payment is completed
+    let statusToBeUpdated;
+    if (order.type === "cash") {
+      statusToBeUpdated = "purchased";
+    } else {
+      statusToBeUpdated = "swapped";
+    }
     // create a payout which will be in pending state first
     const newPayout = await Payout.create({
-      buyer: req.user._id,
-      seller: req.body.sellerId,
-      product: req.body.productId,
+      order: req.body.orderId,
       amount: req.body.amount,
       duration: req.body.duration,
     });
 
     const payoutId = newPayout._id;
     const senderId = req.user._id;
-    const receiverId = req.body.sellerId;
+    const receiverId = order.seller._id;
     const amount = req.body.amount;
     const duration = req.body.duration;
+    const orderId = req.body.orderId;
 
     await agenda.schedule(`in ${duration} minutes`, "send money", {
       payoutId,
       senderId,
       receiverId,
       amount,
+      orderId,
+      statusToBeUpdated,
     });
     res.status(200).json({
       status: "success",

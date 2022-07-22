@@ -15,9 +15,23 @@ agenda.define(
   "send money",
   { priority: "high", concurrency: 10 },
   async (job) => {
-    const { payoutId, senderId, receiverId, amount } = job.attrs.data;
+    const {
+      payoutId,
+      senderId,
+      receiverId,
+      amount,
+      orderId,
+      statusToBeUpdated,
+    } = job.attrs.data;
     try {
-      await sendMoney(payoutId, senderId, receiverId, amount);
+      await sendMoney(
+        payoutId,
+        senderId,
+        receiverId,
+        amount,
+        orderId,
+        statusToBeUpdated
+      );
     } catch (error) {
       console.log(error);
     }

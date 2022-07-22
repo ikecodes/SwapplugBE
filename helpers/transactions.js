@@ -2,6 +2,7 @@ const Wallet = require("../models/walletModel");
 const Transaction = require("../models/transactionModel");
 const Withdraw = require("../models/withdrawModel");
 const Payout = require("../models/payoutModel");
+const Order = require("../models/orderModel");
 // Get User wallet
 exports.getUserWallet = async (userId) => {
   return new Promise(async (resolve, reject) => {
@@ -92,20 +93,32 @@ exports.updateWallet = async (userId, amount, transactionType) => {
   });
 };
 // Send money
-exports.sendMoney = async (payoutId, senderId, receiverId, amount) => {
+exports.sendMoney = async (
+  payoutId,
+  senderId,
+  receiverId,
+  amount,
+  orderId,
+  statusToBeUpdated
+) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const senderWallet = await Wallet.findOne({ userId: senderId });
-      senderWallet.balance -= amount;
-      await senderWallet.save();
+      const payout = await Payout.findById(payoutId);
+      if (payout.transfer === true) {
+        const senderWallet = await Wallet.findOne({ userId: senderId });
+        senderWallet.balance -= amount;
+        await senderWallet.save();
 
-      const receiverWallet = await Wallet.findOne({ userId: receiverId });
-      receiverWallet.balance += amount;
-      await receiverWallet.save();
+        const receiverWallet = await Wallet.findOne({ userId: receiverId });
+        receiverWallet.balance += amount;
+        await receiverWallet.save();
 
-      const payout = await Payout.findByIdAndUpdate(payoutId, {
-        status: "completed",
-      });
+        payout.status === "completed";
+        payout.save();
+        await Order.findByIdAndUpdate(orderId, { status: statusToBeUpdated });
+      } else {
+        console.log("no transfer ");
+      }
       resolve(payout);
     } catch (error) {
       await Payout.findByIdAndUpdate(payoutId, {
