@@ -12,12 +12,6 @@ module.exports = {
    * @method POST
    */
   sendMessage: catchAsync(async (req, res, next) => {
-    const savedAccountToken = await Token.findOne({
-      userId: req.body.receiverId,
-    });
-
-    const fcmDeviceToken = savedAccountToken.fcmToken;
-
     const newMessage = await Message.create({
       conversationId: req.body.conversationId,
       orderId: req.body.orderId,
@@ -26,6 +20,11 @@ module.exports = {
       message: req.body.message,
     });
 
+    const savedAccountToken = await Token.findOne({
+      userId: req.body.receiverId,
+    });
+
+    const fcmDeviceToken = savedAccountToken.fcmToken;
     const fcmData = {
       type: req.body.type,
       receiverId: req.body.receiverId,

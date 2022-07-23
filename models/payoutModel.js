@@ -34,6 +34,11 @@ const payoutSchema = new mongoose.Schema(
   }
 );
 
+payoutSchema.pre(/^find/, function (next) {
+  this.populate("order");
+  next();
+});
+
 const Payout = mongoose.model("Payout", payoutSchema);
 
 module.exports = Payout;

@@ -1,9 +1,11 @@
 const Wallet = require("../models/walletModel");
 const Payout = require("../models/payoutModel");
 const Order = require("../models/orderModel");
+const Notification = require("../models/notificationModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
-const { transferCash } = require("../services/agenda");
+const FireBaseService = require("../services/firebase");
+const Token = require("../models/tokenModel");
 const agenda = require("../services/agenda");
 
 module.exports = {
@@ -107,18 +109,44 @@ module.exports = {
   }),
   /**
    * @function updatePayout
-   * @route /api/v1/payouts
+   * @route /api/v1/payouts/disputePayout/:id
    * @method PATCH
    */
-  updatePayout: catchAsync(async (req, res, next) => {
+  disputePayout: catchAsync(async (req, res, next) => {
     const updatedPayout = await Payout.findOneAndUpdate(
       {
         _id: req.params.id,
-        buyer: req.user._id,
       },
-      req.body,
+      { transfer: false },
       { new: true }
     );
+
+    const savedAccountToken = await Token.findOne({
+      userId: updatedPayout.order.seller,
+    });
+
+    const fcmDeviceToken = savedAccountToken.fcmToken;
+
+    await Notification.create({
+      userId: updatedPayout.order.seller,
+      orderId: updatedPayout.order,
+      title: "Cancelled payout",
+      message: `${req.user.firstName} ${req.user.lastName} has cancelled your payout, support will contact you`,
+    });
+
+    const fcmData = {
+      type: "text",
+      message: `${req.user.firstName} ${req.user.lastName} has cancelled your payout, support will contact you`,
+      time: `${Date.now()}`,
+    };
+
+    const fcmNotification = {
+      title: "Cancelled payout",
+      body: `${req.user.firstName} ${req.user.lastName} has cancelled your payout, support will contact you`,
+    };
+
+    FireBaseService.sendSingleMessage(fcmDeviceToken, fcmData, fcmNotification);
+
     if (!updatedPayout)
       return next(new AppError("No payout found to update", 404));
     res.status(200).json({

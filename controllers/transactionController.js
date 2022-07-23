@@ -277,7 +277,7 @@ module.exports = {
           new: true,
         }
       );
-      await updateWallet(withdraw.userId._id, data.amount, transactionType);
+      await updateWallet(withdraw.userId, data.amount, transactionType);
       return;
     }
   }),

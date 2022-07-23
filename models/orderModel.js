@@ -35,7 +35,7 @@ const orderSchema = new mongoose.Schema(
 );
 
 orderSchema.pre(/^find/, function (next) {
-  this.populate("product").populate("buyer");
+  this.populate("product").populate("buyer").populate("seller");
 
   next();
 });
