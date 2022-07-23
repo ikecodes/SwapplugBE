@@ -263,16 +263,21 @@ module.exports = {
     const { data } = req.body;
 
     if (data.status === "SUCCESSFUL") {
-      const withdraw = await Withdraw.findOne({ transactionId: data.id });
-      withdraw.status = data.status;
-      withdraw.save();
+      await Withdraw.findOneAndUpdate(
+        { transactionId: data.id },
+        { status: data.status }
+      );
       return;
     } else {
       const transactionType = "fund";
-      const withdraw = await Withdraw.findOne({ transactionId: data.id });
-      withdraw.status = data.status;
-      withdraw.save();
-      await updateWallet(withdraw.userId, data.amount, transactionType);
+      const withdraw = await Withdraw.findOneAndUpdate(
+        { transactionId: data.id },
+        { status: data.status },
+        {
+          new: true,
+        }
+      );
+      await updateWallet(withdraw.userId._id, data.amount, transactionType);
       return;
     }
   }),
