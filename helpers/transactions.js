@@ -121,8 +121,6 @@ exports.sendMoney = async (
           status: newOrderStatus,
         });
         await Promise.all([payoutPromise, orderPromise]);
-      } else {
-        console.log("no transfer ");
       }
       resolve(payout);
     } catch (error) {
