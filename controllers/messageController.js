@@ -70,7 +70,7 @@ module.exports = {
       req.file.path,
       null,
       {
-        folder: "TB_ChatImage",
+        folder: "ChatImage",
       }
     );
 

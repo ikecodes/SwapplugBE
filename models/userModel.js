@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema(
     photo: {
       type: String,
       default:
-        "https://res.cloudinary.com/djwxy9aol/image/upload/v1651972394/fuixnwpb8lq78zazftsn.png",
+        "https://res.cloudinary.com/code-inclusive/image/upload/v1658575730/Profile/img8onzlkpg8pb0g4h3y.png",
     },
     identityCard: String,
     identityCardPublicId: String,

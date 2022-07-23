@@ -312,7 +312,7 @@ module.exports = {
       req.file.path,
       null,
       {
-        folder: "TB_Profile",
+        folder: "Profile",
       }
     );
 
@@ -366,7 +366,7 @@ module.exports = {
       req.file.path,
       null,
       {
-        folder: "TB_ID",
+        folder: "ID",
       }
     );
 

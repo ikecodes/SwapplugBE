@@ -17,7 +17,7 @@ module.exports = {
       const { secure_url, public_id } = await cloudinary.uploader.upload(
         file.path,
         null,
-        { folder: "TB_Product" }
+        { folder: "Product" }
       );
       return {
         original: secure_url,
