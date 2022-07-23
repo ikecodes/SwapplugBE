@@ -113,23 +113,28 @@ module.exports = {
    * @method PATCH
    */
   disputePayout: catchAsync(async (req, res, next) => {
-    const updatedPayout = await Payout.findOneAndUpdate(
-      {
-        _id: req.params.id,
-      },
-      { transfer: false },
-      { new: true }
-    );
+    const payout = await Payout.findById(req.params.id);
+
+    if (payout.status === "completed")
+      return next(
+        new AppError(
+          "This payout has already been made as warranty has expired",
+          400
+        )
+      );
+
+    payout.transfer = false;
+    payout.save();
 
     const savedAccountToken = await Token.findOne({
-      userId: updatedPayout.order.seller,
+      userId: payout.order.seller,
     });
 
     const fcmDeviceToken = savedAccountToken.fcmToken;
 
     await Notification.create({
-      userId: updatedPayout.order.seller,
-      orderId: updatedPayout.order,
+      userId: payout.order.seller,
+      orderId: payout.order,
       title: "Cancelled payout",
       message: `${req.user.firstName} ${req.user.lastName} has cancelled your payout, support will contact you`,
     });
@@ -147,11 +152,9 @@ module.exports = {
 
     FireBaseService.sendSingleMessage(fcmDeviceToken, fcmData, fcmNotification);
 
-    if (!updatedPayout)
-      return next(new AppError("No payout found to update", 404));
     res.status(200).json({
       status: "success",
-      data: updatedPayout,
+      data: payout,
     });
   }),
   /**
