@@ -30,6 +30,7 @@ module.exports = {
       about: req.body.about,
       status: req.body.status,
       name: req.body.name,
+      state: req.body.state,
       category: req.body.category,
       price: req.body.price,
       faults: req.body.faults,

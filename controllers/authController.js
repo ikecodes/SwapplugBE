@@ -34,6 +34,7 @@ module.exports = {
       password: req.body.password,
       gender: req.body.gender,
       referrer: req.body.referrer,
+      state: req.body.state,
     });
 
     // create wallet for new user

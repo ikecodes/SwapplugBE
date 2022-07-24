@@ -11,6 +11,8 @@ const productSchema = new mongoose.Schema(
     expiryDate: Date,
     durationUsed: String,
     slug: String,
+    state: String,
+    stateSlug: String,
     availableForSwap: {
       type: Number,
       default: 1,
@@ -59,8 +61,11 @@ productSchema.virtual("reviews", {
   localField: "_id",
 });
 
-productSchema.pre("save", async function (next) {
+productSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });
+  this.stateSlug = slugify(this.state, { lower: true });
+
+  next();
 });
 
 productSchema.pre(/^find/, function (next) {

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const slugify = require("slugify");
 
 const userSchema = new mongoose.Schema(
   {
@@ -29,6 +30,8 @@ const userSchema = new mongoose.Schema(
       default:
         "https://res.cloudinary.com/code-inclusive/image/upload/v1658575730/Profile/img8onzlkpg8pb0g4h3y.png",
     },
+    state: String,
+    stateSlug: String,
     identityCard: String,
     identityCardPublicId: String,
     role: {
@@ -123,6 +126,10 @@ userSchema.pre("save", function (next) {
   next();
 });
 
+userSchema.pre("save", function (next) {
+  this.stateSlug = slugify(this.state, { lower: true });
+  next();
+});
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
