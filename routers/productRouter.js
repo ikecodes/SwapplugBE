@@ -11,7 +11,9 @@ router
   .route("/getAllProductsByUser/:id")
   .get(ProductController.getAllProductsByUser);
 router.route("/:id").get(ProductController.getProduct);
-router.route("/:id").patch(ProductController.editProduct);
+router
+  .route("/:id")
+  .patch(upload.array("images"), ProductController.editProduct);
 router.route("/").post(upload.array("images"), ProductController.createProduct);
 router.route("/:id").delete(ProductController.deleteProduct);
 

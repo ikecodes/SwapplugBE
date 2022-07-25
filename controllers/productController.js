@@ -150,6 +150,49 @@ module.exports = {
    * @method PATCH
    */
   editProduct: catchAsync(async (req, res, next) => {
+    // if we have images in the request
+    if (req.files.length > 0) {
+      // delete the previous images first
+      const product = await Product.findOne({ _id: req.params.id });
+      const deletePromises = product.images.map(async (image) => {
+        await cloudinary.uploader.destroy(image.publicId, null, {
+          folder: "Product",
+        });
+      });
+      await Promise.all(deletePromises);
+      product.images = null;
+      product.save();
+
+      // upload the new images
+      const imagesPromises = req.files.map(async (file) => {
+        const { secure_url, public_id } = await cloudinary.uploader.upload(
+          file.path,
+          null,
+          { folder: "Product" }
+        );
+        return {
+          original: secure_url,
+          publicId: public_id,
+        };
+      });
+      const images = await Promise.all(imagesPromises);
+      const newProduct = await Product.findByIdAndUpdate(
+        req.params.id,
+        {
+          ...req.body,
+          images: images,
+        },
+        {
+          new: true,
+        }
+      );
+      res.status(200).json({
+        status: "success",
+        data: newProduct,
+      });
+      return;
+    }
+
     const newProduct = await Product.findByIdAndUpdate(
       req.params.id,
       req.body,
