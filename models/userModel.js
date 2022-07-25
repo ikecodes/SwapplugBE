@@ -127,7 +127,9 @@ userSchema.pre("save", function (next) {
 });
 
 userSchema.pre("save", function (next) {
-  this.stateSlug = slugify(this.state, { lower: true });
+  if (this.state) {
+    this.stateSlug = slugify(this.state, { lower: true });
+  }
   next();
 });
 userSchema.methods.correctPassword = async function (

@@ -94,6 +94,9 @@ module.exports = {
     const user = await User.findById(req.params.id);
     if (!user) return next(new AppError("No user found with this Id", 404));
 
+    if (user._id.toString() === req.user._id.toString())
+      return next(new AppError("You cannot follow yourself", 404));
+
     const alreadyFollowing = user.followers.includes(req.user._id);
     if (alreadyFollowing)
       return res.status(200).json({
