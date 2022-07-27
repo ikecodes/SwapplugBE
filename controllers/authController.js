@@ -44,7 +44,7 @@ module.exports = {
     await newUser.save({ validateBeforeSave: false });
     const options = {
       mail: newUser.email,
-      subject: "Welcome to Trade By Barter!",
+      subject: "Welcome to Swap Plug!",
       email: "../email/welcome.ejs",
       firtname: newUser.firstName,
       token: token,
@@ -84,7 +84,7 @@ module.exports = {
     await user.save({ validateBeforeSave: false });
     const options = {
       mail: user.email,
-      subject: "Welcome to Spid Realty!",
+      subject: "Welcome to Swap Plug!",
       email: "../email/welcome.ejs",
       firtname: user.firstName,
       token: token,
