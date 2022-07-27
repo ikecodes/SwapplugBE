@@ -68,11 +68,9 @@ module.exports = {
     const docPromise = products.query;
 
     const [count, doc] = await Promise.all([countPromise, docPromise]);
-    const favorites = await Favorite.find({ user: req.user._id }).select(
-      "product"
-    );
+    const favorites = await Favorite.find({ user: req.user._id });
 
-    const filteredFavorites = favorites.map((favorite) => favorite.product.id);
+    const filteredFavorites = favorites.map((favorite) => favorite.product._id);
     const mainProducts = doc.map((product) =>
       filteredFavorites.includes(product.id)
         ? { ...product._doc, favorite: true }
