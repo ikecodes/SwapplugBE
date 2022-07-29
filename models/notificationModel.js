@@ -5,9 +5,24 @@ const notificationSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
+    to: {
+      type: String,
+    },
+    type: {
+      type: String,
+      enum: ["order", "payout", "product"],
+    },
     orderId: {
       type: mongoose.Schema.ObjectId,
       ref: "Order",
+    },
+    payoutId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Payout",
+    },
+    productId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Product",
     },
     title: {
       type: String,

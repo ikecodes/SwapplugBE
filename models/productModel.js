@@ -70,14 +70,14 @@ productSchema.pre("save", function (next) {
   next();
 });
 
-// productSchema.pre(/^find/, function (next) {
-//   this.populate({
-//     path: "seller",
-//     select: "-__v -passwordChangedAt",
-//   });
+productSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "seller",
+    select: "-__v -passwordChangedAt",
+  });
 
-//   next();
-// });
+  next();
+});
 
 const Product = mongoose.model("Product", productSchema);
 
