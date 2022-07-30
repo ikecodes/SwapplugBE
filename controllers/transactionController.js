@@ -155,8 +155,22 @@ module.exports = {
         response: "wallet funded successfully",
         data: wallet,
       });
+    } else if (status === "failed") {
+      return next(new AppError("Transaction failed", 400));
     } else {
-      return next(new AppError("transaction unsuccessful", "400"));
+      const transactionExist = await Transaction.findOne({
+        transactionId: id,
+        userId: req.user._id,
+      });
+
+      if (transactionExist) {
+        return next(new AppError("Transaction already exist", 409));
+      }
+
+      await createTransaction(req.user._id, id, status, currency, amount);
+      return res.status(200).json({
+        response: "Payment is being processed",
+      });
     }
   }),
   /**
