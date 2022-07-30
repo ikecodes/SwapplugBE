@@ -70,6 +70,7 @@ module.exports = {
     await Notification.create({
       userId: req.body.sellerId,
       orderId: newOrder._id.toString(),
+      type: "order",
       title,
       message,
     });
