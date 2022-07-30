@@ -174,8 +174,8 @@ module.exports = {
     });
   }),
   /**
-   * @function deactivateUser
-   * @route /api/v1/users/deactivateUser
+   * @function activeStatus
+   * @route /api/v1/users/activeStatus
    * @method PATCH
    */
   activeStatus: catchAsync(async (req, res, next) => {
@@ -189,6 +189,17 @@ module.exports = {
     res.status(200).json({
       status: "success",
       data: user,
+    });
+  }),
+  /**
+   * @function deactivateMe
+   * @route /api/v1/users/deactivateMe
+   * @method PATCH
+   */
+  deactivateMe: catchAsync(async (req, res, next) => {
+    await User.findByIdAndUpdate(req.user._id, { active: false });
+    res.status(200).json({
+      status: "success",
     });
   }),
 };

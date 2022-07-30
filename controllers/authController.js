@@ -141,6 +141,8 @@ module.exports = {
       return next(new AppError("please provide email and password!", 400));
     }
     const user = await User.findOne({ email }).select("+password");
+    if (user.active === false)
+      return next(new AppError("incorrect email or password!", 401));
     if (user.emailConfirmToken)
       return next(new AppError("please verify your email address", 401));
 

@@ -32,6 +32,7 @@ router.route("/getUser/:id").get(UserController.getUser);
 router.route("/getUserStats").get(UserController.getUserStats);
 router.route("/followUser/:id").patch(UserController.followUser);
 router.route("/unfollowUser/:id").patch(UserController.unfollowUser);
+router.route("/deactivateMe").patch(UserController.deactivateMe);
 
 router.use(role("admin"));
 router.route("/").get(UserController.getAllUsers);
