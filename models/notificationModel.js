@@ -7,6 +7,7 @@ const notificationSchema = new mongoose.Schema(
     },
     to: {
       type: String,
+      default: "user",
     },
     type: {
       type: String,

@@ -7,6 +7,7 @@ const AppError = require("../helpers/appError");
 const FireBaseService = require("../services/firebase");
 const Token = require("../models/tokenModel");
 const agenda = require("../services/agenda");
+const { sendToOne } = require("../helpers/notification");
 
 module.exports = {
   /**
@@ -114,7 +115,6 @@ module.exports = {
    */
   disputePayout: catchAsync(async (req, res, next) => {
     const payout = await Payout.findById(req.params.id);
-
     if (payout.status === "completed")
       return next(
         new AppError(
@@ -122,35 +122,41 @@ module.exports = {
           400
         )
       );
-
     payout.transfer = false;
     payout.save();
 
-    const savedAccountToken = await Token.findOne({
-      userId: payout.order.seller,
-    });
-
-    const fcmDeviceToken = savedAccountToken.fcmToken;
+    const notificationType = "text";
+    const title = "Cancelled payout";
+    const buyerId = req.user._id;
+    const buyerMessage = `We have successfully cancelled the payout, support will contact you`;
+    const sellerId = payout.order.seller;
+    const sellerMessage = `${req.user.firstName} ${req.user.lastName} has cancelled your payout, support will contact you`;
 
     await Notification.create({
-      userId: payout.order.seller,
-      orderId: payout.order,
-      title: "Cancelled payout",
-      message: `${req.user.firstName} ${req.user.lastName} has cancelled your payout, support will contact you`,
+      userId: sellerId,
+      type: "payout",
+      payoutId: req.params.id,
+      title: title,
+      message: sellerMessage,
+    });
+    await Notification.create({
+      userId: buyerId,
+      type: "payout",
+      payoutId: req.params.id,
+      title: title,
+      message: buyerMessage,
+    });
+    await Notification.create({
+      // userId: payout.order.seller,
+      to: "admin",
+      type: "payout",
+      payoutId: req.params.id,
+      title: title,
+      message: sellerMessage,
     });
 
-    const fcmData = {
-      type: "text",
-      message: `${req.user.firstName} ${req.user.lastName} has cancelled your payout, support will contact you`,
-      time: `${Date.now()}`,
-    };
-
-    const fcmNotification = {
-      title: "Cancelled payout",
-      body: `${req.user.firstName} ${req.user.lastName} has cancelled your payout, support will contact you`,
-    };
-
-    FireBaseService.sendSingleMessage(fcmDeviceToken, fcmData, fcmNotification);
+    await sendToOne(sellerId, notificationType, sellerMessage, title);
+    await sendToOne(buyerId, notificationType, buyerMessage, title);
 
     res.status(200).json({
       status: "success",
