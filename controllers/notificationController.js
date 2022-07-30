@@ -7,31 +7,35 @@ const FireBaseService = require("../services/firebase");
 module.exports = {
   /**
    * @function sendNotification
-   * @route /api/v1/notifications/tradeRequest
+   * @route /api/v1/notifications/markRequest
    * @method POST
    */
-  tradeRequest: catchAsync(async (req, res, next) => {
+  markRequest: catchAsync(async (req, res, next) => {
     const savedAccountToken = await Token.findOne({
       userId: req.body.sellerId,
     });
 
+    const type = "product";
+    const title = "New message";
+    const message = "One of you product has been marked for possible swap";
     await Notification.create({
       userId: req.body.sellerId,
-      orderId: req.body.orderId,
-      title: req.body.title,
-      message: req.body.message,
+      productId: req.body.productId,
+      type: type,
+      title: title,
+      message: message,
     });
 
     const fcmData = {
       type: "text",
-      message: req.body.message,
+      message: message,
       time: `${Date.now()}`,
     };
     const fcmDeviceToken = savedAccountToken.fcmToken;
 
     const fcmNotification = {
-      title: req.body.title,
-      body: req.body.message,
+      title: title,
+      body: message,
     };
 
     FireBaseService.sendSingleMessage(fcmDeviceToken, fcmData, fcmNotification);

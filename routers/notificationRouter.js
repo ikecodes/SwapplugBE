@@ -6,7 +6,7 @@ const router = Router();
 
 router.use(auth);
 
-router.route("/tradeRequest").post(notificationController.tradeRequest);
+router.route("/markRequest").post(notificationController.markRequest);
 router.route("/").get(notificationController.getAllNotifications);
 
 module.exports = router;
