@@ -75,7 +75,7 @@ module.exports = {
 
     const data = await ChatImage.create({
       conversationId: req.body.conversationId,
-      pulicId: public_id,
+      publicId: public_id,
       imageUrl: secure_url,
     });
 

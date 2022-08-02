@@ -135,22 +135,19 @@ module.exports = {
 
     const { status, currency, id, amount } = response.data;
 
+    const transactionExist = await Transaction.findOne({
+      transactionId: id,
+      userId: req.user._id,
+    });
+
+    if (transactionExist) {
+      return next(new AppError("Transaction already exist", 409));
+    }
+    await createTransaction(req.user._id, id, status, currency, amount);
+
     if (status === "successful") {
-      const transactionExist = await Transaction.findOne({
-        transactionId: id,
-        userId: req.user._id,
-      });
-
-      if (transactionExist) {
-        return next(new AppError("Transaction already exist", 409));
-      }
-
-      await createTransaction(req.user._id, id, status, currency, amount);
-
       await updateWallet(req.user._id, amount, transactionType);
-
       const wallet = await getUserWallet(req.user._id);
-
       return res.status(200).json({
         response: "wallet funded successfully",
         data: wallet,
@@ -158,16 +155,6 @@ module.exports = {
     } else if (status === "failed") {
       return next(new AppError("Transaction failed", 400));
     } else {
-      const transactionExist = await Transaction.findOne({
-        transactionId: id,
-        userId: req.user._id,
-      });
-
-      if (transactionExist) {
-        return next(new AppError("Transaction already exist", 409));
-      }
-
-      await createTransaction(req.user._id, id, status, currency, amount);
       return res.status(200).json({
         response: "Payment is being processed",
       });

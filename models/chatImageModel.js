@@ -5,7 +5,7 @@ const chatImageSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "Conversation",
     },
-    pulicId: {
+    publicId: {
       type: String,
     },
     imageUrl: {
