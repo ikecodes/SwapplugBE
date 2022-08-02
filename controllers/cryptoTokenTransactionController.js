@@ -1,4 +1,4 @@
-const CryptoTokenTransaction = require("../models/cryptoTokenModel");
+const CryptoTokenTransaction = require("../models/cryptoTokenTransactionModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
 
