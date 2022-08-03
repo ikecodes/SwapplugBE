@@ -8,6 +8,46 @@ const { initializeWithdraw } = require("../services/lazerpay");
 
 module.exports = {
   /**
+   * @function webhookPayment
+   * @route /api/v1/coins/webhook/payment
+   * @method POST
+   */
+  webhookPayment: catchAsync(async (req, res, next) => {
+    var hash = crypto
+      .createHmac("sha256", process.env.LAZER_SECRET_KEY)
+      .update(JSON.stringify(req.body), "utf8")
+      .digest("hex");
+
+    if (hash == req.headers["x-lazerpay-signature"]) {
+      const data = req.body; // payload from lazerpay
+      const transactionExists = await CoinTransaction.findOne({
+        id: data.id,
+        reference: data.reference,
+      });
+
+      if (transactionExists && transactionExists.status !== "confirmed") {
+        const coinWalletExists = await CoinWallet.findOne({
+          type: data.coin,
+          userId: data.customer.id,
+        });
+        if (!coinWalletExists) {
+          await CoinWallet.create({
+            balance: data.amountPaid,
+            type: data.coin,
+            userId: data.customer.id,
+          });
+        } else {
+          coinWalletExists.balance += data.amountPaid;
+          await coinWalletExists.save();
+        }
+        await CoinTransaction.findByIdAndUpdate(transactionExists._id, {
+          status: data.status,
+        });
+      }
+    }
+    res.send(200);
+  }),
+  /**
    * @function confirmPayment
    * @route /api/v1/coins/confirmPayment
    * @method POST
@@ -100,7 +140,7 @@ module.exports = {
   withdraw: catchAsync(async (req, res, next) => {
     const transaction_payload = {
       amount: req.body.amount,
-      recipient: req.body.address, // address must be a bep20 address
+      recipient: req.body.recipient, // address must be a bep20 address
       coin: req.body.coin,
       blockchain: "Binance Smart Chain",
     };
