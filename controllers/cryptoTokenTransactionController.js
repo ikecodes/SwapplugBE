@@ -1,4 +1,5 @@
 const CryptoTokenTransaction = require("../models/cryptoTokenTransactionModel");
+const TokenWallet = require("../models/tokenWalletModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
 
@@ -38,7 +39,7 @@ module.exports = {
     const transactionExists = await CryptoTokenTransaction.findOne({ id: id });
     if (transactionExists)
       return next(new AppError("This transaction already exists", 400));
-    const newTransaction = await CryptoTokenTransaction.create({
+    await CryptoTokenTransaction.create({
       userId: req.user._id,
       acceptPartialPayment,
       actualAmount,
@@ -63,11 +64,29 @@ module.exports = {
     });
 
     if (status === "confirmed") {
-      // add money to wallet
+      const tokenWalletExists = await TokenWallet.findOne({
+        type: "USDT",
+        userId: req.user._id,
+      });
+      if (!tokenWalletExists) {
+        await TokenWallet.create({
+          balance: amountPaid,
+          type: "USDT",
+          userId: req.user._id,
+        });
+      } else {
+        tokenWalletExists.balance += amountPaid;
+        await tokenWalletExists.save();
+      }
     }
+
+    const updatedWallet = await TokenWallet.findOne({
+      type: "USDT",
+      userId: req.user._id,
+    });
     res.status(200).json({
       status: "success",
-      data: newTransaction,
+      data: updatedWallet,
     });
   }),
   /**
