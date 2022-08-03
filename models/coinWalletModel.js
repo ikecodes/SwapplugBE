@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const tokenWalletSchema = new mongoose.Schema(
+const coinWalletSchema = new mongoose.Schema(
   {
     balance: { type: Number, default: 0 },
     type: {
@@ -18,6 +18,6 @@ const tokenWalletSchema = new mongoose.Schema(
   }
 );
 
-const TokenWallet = mongoose.model("TokenWallet", tokenWalletSchema);
+const CoinWallet = mongoose.model("CoinWallet", coinWalletSchema);
 
-module.exports = TokenWallet;
+module.exports = CoinWallet;

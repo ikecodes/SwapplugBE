@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const cryptoTokenTransactionSchema = new mongoose.Schema(
+const coinTransactionSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.ObjectId,
@@ -46,9 +46,9 @@ const cryptoTokenTransactionSchema = new mongoose.Schema(
   }
 );
 
-const CryptoTokenTransaction = mongoose.model(
-  "CryptoTokenTransaction",
-  cryptoTokenTransactionSchema
+const CoinTransaction = mongoose.model(
+  "CoinTransaction",
+  coinTransactionSchema
 );
 
-module.exports = CryptoTokenTransaction;
+module.exports = CoinTransaction;

@@ -1,5 +1,5 @@
-const CryptoTokenTransaction = require("../models/cryptoTokenTransactionModel");
-const TokenWallet = require("../models/tokenWalletModel");
+const CoinTransaction = require("../models/coinTransactionModel");
+const CoinWallet = require("../models/coinWalletModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
 
@@ -36,10 +36,13 @@ module.exports = {
       type,
     } = req.body;
 
-    const transactionExists = await CryptoTokenTransaction.findOne({ id: id });
+    const transactionExists = await CoinTransaction.findOne({
+      id,
+      reference,
+    });
     if (transactionExists)
       return next(new AppError("This transaction already exists", 400));
-    await CryptoTokenTransaction.create({
+    await CoinTransaction.create({
       userId: req.user._id,
       acceptPartialPayment,
       actualAmount,
@@ -64,23 +67,23 @@ module.exports = {
     });
 
     if (status === "confirmed") {
-      const tokenWalletExists = await TokenWallet.findOne({
+      const coinWalletExists = await CoinWallet.findOne({
         type: "USDT",
         userId: req.user._id,
       });
-      if (!tokenWalletExists) {
-        await TokenWallet.create({
+      if (!coinWalletExists) {
+        await CoinWallet.create({
           balance: amountPaid,
           type: "USDT",
           userId: req.user._id,
         });
       } else {
-        tokenWalletExists.balance += amountPaid;
-        await tokenWalletExists.save();
+        coinWalletExists.balance += amountPaid;
+        await coinWalletExists.save();
       }
     }
 
-    const updatedWallet = await TokenWallet.findOne({
+    const updatedWallet = await CoinWallet.findOne({
       type: "USDT",
       userId: req.user._id,
     });
@@ -98,7 +101,7 @@ module.exports = {
     const transaction_payload = {
       amount: req.body.amount,
       recipient: req.body.address, // address must be a bep20 address
-      coin: "USDT",
+      coin: req.body.coin,
       blockchain: "Binance Smart Chain",
     };
 
