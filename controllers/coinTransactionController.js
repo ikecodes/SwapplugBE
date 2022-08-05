@@ -158,4 +158,19 @@ module.exports = {
       data: response,
     });
   }),
+  /**
+   * @function getWallet
+   * @route /api/v1/coins/wallet
+   * @method GET
+   */
+  getWallet: catchAsync(async (req, res, next) => {
+    const wallet = await CoinWallet.findOne({
+      userId: req.user._id,
+      type: "USDT",
+    });
+    res.status(200).json({
+      status: "success",
+      data: wallet,
+    });
+  }),
 };
