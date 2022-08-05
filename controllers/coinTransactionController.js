@@ -14,12 +14,13 @@ module.exports = {
    * @method POST
    */
   webhookPayment: catchAsync(async (req, res, next) => {
-    // var hash = crypto
-    //   .createHmac("sha256", process.env.LAZER_SECRET_KEY)
-    //   .update(JSON.stringify(req.body), "utf8")
-    //   .digest("hex");
+    var hash = crypto
+      .createHmac("sha256", process.env.LAZER_SECRET_KEY)
+      .update(JSON.stringify(req.body), "utf8")
+      .digest("hex");
 
-    // if (hash !== req.headers["x-lazerpay-signature"]) return res.sendStatus(200);
+    if (hash !== req.headers["x-lazerpay-signature"])
+      return res.sendStatus(200);
     const data = req.body;
 
     if (data.webhookType === "DEPOSIT_TRANSACTION") {
@@ -33,7 +34,6 @@ module.exports = {
           type: data.coin,
           userId: data.customer.id,
         });
-        console.log(coinWalletExists);
         if (!coinWalletExists) {
           await CoinWallet.create({
             balance: data.amountPaid,
