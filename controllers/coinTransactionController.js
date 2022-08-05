@@ -1,3 +1,4 @@
+var crypto = require("crypto");
 const CoinTransaction = require("../models/coinTransactionModel");
 const CoinWallet = require("../models/coinWalletModel");
 const catchAsync = require("../helpers/catchAsync");
@@ -13,13 +14,15 @@ module.exports = {
    * @method POST
    */
   webhookPayment: catchAsync(async (req, res, next) => {
-    var hash = crypto
-      .createHmac("sha256", process.env.LAZER_SECRET_KEY)
-      .update(JSON.stringify(req.body), "utf8")
-      .digest("hex");
+    // var hash = crypto
+    //   .createHmac("sha256", process.env.LAZER_SECRET_KEY)
+    //   .update(JSON.stringify(req.body), "utf8")
+    //   .digest("hex");
 
-    if (hash == req.headers["x-lazerpay-signature"]) {
-      const data = req.body; // payload from lazerpay
+    // if (hash !== req.headers["x-lazerpay-signature"]) return res.sendStatus(200);
+    const data = req.body;
+
+    if (data.webhookType === "DEPOSIT_TRANSACTION") {
       const transactionExists = await CoinTransaction.findOne({
         id: data.id,
         reference: data.reference,
@@ -30,6 +33,7 @@ module.exports = {
           type: data.coin,
           userId: data.customer.id,
         });
+        console.log(coinWalletExists);
         if (!coinWalletExists) {
           await CoinWallet.create({
             balance: data.amountPaid,
@@ -44,8 +48,11 @@ module.exports = {
           status: data.status,
         });
       }
+    } else {
+      console.log("for deposite");
     }
-    res.send(200);
+
+    res.sendStatus(200);
   }),
   /**
    * @function confirmPayment
@@ -123,13 +130,12 @@ module.exports = {
       }
     }
 
-    const updatedWallet = await CoinWallet.findOne({
-      type: "USDT",
-      userId: req.user._id,
-    });
+    // const updatedWallet = await CoinWallet.findOne({
+    //   type: "USDT",
+    //   userId: req.user._id,
+    // });
     res.status(200).json({
       status: "success",
-      data: updatedWallet,
     });
   }),
   /**
