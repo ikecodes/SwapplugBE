@@ -2,7 +2,8 @@ const Agenda = require("agenda");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const { sendMoney } = require("../helpers/transactions");
+const { sendNGN } = require("../helpers/transactions");
+const { sendUSDT } = require("../helpers/coinTransactions");
 
 const agenda = new Agenda({
   db: { address: process.env.REMOTE_DATABASE, collection: "jobs" },
@@ -12,7 +13,7 @@ const agenda = new Agenda({
 
 // definitions
 agenda.define(
-  "send money",
+  "agendaSendNGN",
   { priority: "high", concurrency: 10 },
   async (job) => {
     const {
@@ -25,7 +26,36 @@ agenda.define(
       amountToBeSent,
     } = job.attrs.data;
     try {
-      await sendMoney(
+      await sendNGN(
+        payoutId,
+        senderId,
+        receiverId,
+        amountToBeDebited,
+        orderId,
+        newOrderStatus,
+        amountToBeSent
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+// definitions
+agenda.define(
+  "agendaSendUSDT",
+  { priority: "high", concurrency: 10 },
+  async (job) => {
+    const {
+      payoutId,
+      senderId,
+      receiverId,
+      amountToBeDebited,
+      orderId,
+      newOrderStatus,
+      amountToBeSent,
+    } = job.attrs.data;
+    try {
+      await sendUSDT(
         payoutId,
         senderId,
         receiverId,

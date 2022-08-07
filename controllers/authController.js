@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const User = require("../models/userModel");
 const Product = require("../models/productModel");
 const Wallet = require("../models/walletModel");
+const CoinWallet = require("../models/coinWalletModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
 const createAndSendToken = require("../helpers/createAndSendToken");
@@ -37,8 +38,11 @@ module.exports = {
       state: req.body.state,
     });
 
-    // create wallet for new user
+    // create wallet
     await Wallet.create({ userId: newUser._id });
+
+    // create coin wallet
+    await CoinWallet.create({ userId: newUser._id, type: "USDT" });
 
     const token = newUser.createEmailConfirmToken();
     await newUser.save({ validateBeforeSave: false });

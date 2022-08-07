@@ -26,7 +26,14 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["previewed", "inprogress", "swapped", "purchased", "declined"],
+      enum: [
+        "previewed",
+        "inprogress",
+        "swapped",
+        "purchased",
+        "declined",
+        "failed",
+      ],
     },
   },
   {

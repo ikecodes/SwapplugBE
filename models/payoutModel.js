@@ -23,6 +23,10 @@ const payoutSchema = new mongoose.Schema(
       enum: [3, 5, 7],
       default: 3,
     },
+    unit: {
+      type: String,
+      enum: ["NGN", "USDT"],
+    },
     status: {
       type: String,
       enum: ["pending", "completed", "failed"],

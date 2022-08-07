@@ -1,4 +1,5 @@
 const Wallet = require("../models/walletModel");
+const CoinWallet = require("../models/coinWalletModel");
 const Payout = require("../models/payoutModel");
 const Order = require("../models/orderModel");
 const Notification = require("../models/notificationModel");
@@ -39,11 +40,82 @@ module.exports = {
     });
   }),
   /**
-   * @function createPayout
-   * @route /api/v1/payouts
+   * @function createUsdtPayout
+   * @route /api/v1/payouts/usdt
    * @method POST
    */
-  createPayout: catchAsync(async (req, res, next) => {
+  createUsdtPayout: catchAsync(async (req, res, next) => {
+    const order = await Order.findById(req.body.orderId);
+
+    // check if order has already been paid for
+    const alreadyPaid = await Payout.findOne({
+      buyer: req.user._id,
+      seller: order.seller,
+      order: req.body.orderId,
+    });
+    if (alreadyPaid)
+      return next(new AppError("Product has already been paid for", 403));
+
+    // check if this is the buyers order
+    if (req.user._id.toString() !== order.buyer._id.toString())
+      return next(new AppError("This order does not belong to you", 404));
+
+    // get senders wallet and check for balance
+    const senderWallet = await CoinWallet.findOne({ userId: req.user._id });
+    if (senderWallet.balance < parseInt(req.body.amount))
+      return next(
+        new AppError(
+          "You do not have enough balance to perform this transaction",
+          403
+        )
+      );
+
+    // lets know the status to give the order when payment is completed
+    let newOrderStatus;
+    if (order.type === "cash") {
+      newOrderStatus = "purchased";
+    } else {
+      newOrderStatus = "swapped";
+    }
+    // create a payout which will be in pending state first
+    const amountToBeSent = req.body.amount - req.body.fee;
+
+    const newPayout = await Payout.create({
+      order: req.body.orderId,
+      amount: amountToBeSent,
+      fee: req.body.fee,
+      unit: "USDT",
+      duration: req.body.duration,
+    });
+
+    const payoutId = newPayout._id;
+    const senderId = req.user._id;
+    const receiverId = order.seller._id;
+    const amountToBeDebited = req.body.amount;
+    const duration = req.body.duration;
+    const orderId = req.body.orderId;
+
+    await agenda.schedule(`in ${duration} minutes`, "agendaSendUSDT", {
+      payoutId,
+      senderId,
+      receiverId,
+      amountToBeDebited,
+      orderId,
+      newOrderStatus,
+      amountToBeSent,
+    });
+    res.status(200).json({
+      status: "success",
+      message: "Your payment is on its way",
+      data: newPayout,
+    });
+  }),
+  /**
+   * @function createNgnPayout
+   * @route /api/v1/payouts/ngn
+   * @method POST
+   */
+  createNgnPayout: catchAsync(async (req, res, next) => {
     const order = await Order.findById(req.body.orderId);
 
     // check if order has already been paid for
@@ -83,6 +155,7 @@ module.exports = {
       order: req.body.orderId,
       amount: amountToBeSent,
       fee: req.body.fee,
+      unit: "NGN",
       duration: req.body.duration,
     });
 
@@ -93,7 +166,7 @@ module.exports = {
     const duration = req.body.duration;
     const orderId = req.body.orderId;
 
-    await agenda.schedule(`in ${duration} minutes`, "send money", {
+    await agenda.schedule(`in ${duration} minutes`, "agendaSendNGN", {
       payoutId,
       senderId,
       receiverId,

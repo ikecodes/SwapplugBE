@@ -93,7 +93,7 @@ exports.updateWallet = async (userId, amount, transactionType) => {
   });
 };
 // Send money
-exports.sendMoney = async (
+exports.sendNGN = async (
   payoutId,
   senderId,
   receiverId,
