@@ -1,3 +1,5 @@
+const axios = require("axios");
+
 const Lazerpay = require("lazerpay-node-sdk").default;
 
 const lazer = new Lazerpay(
@@ -29,10 +31,37 @@ const lazer = new Lazerpay(
 //     }
 //   });
 // };
-exports.initializeWithdraw = async (transaction_payload) => {
+// exports.initializeWithdraw = async () => {
+//   return new Promise(async (resolve, reject) => {
+//     const transaction_payload = {
+//       amount: 1,
+//       recipient: "0x0B4d358D349809037003F96A3593ff9015E89efA", // address must be a bep20 address
+//       coin: "BUSD",
+//       blockchain: "Binance Smart Chain",
+//     };
+//     try {
+//       const response = await lazer.Payout.transferCrypto(transaction_payload);
+//       resolve(response);
+//     } catch (error) {
+//       reject(error);
+//     }
+//   });
+// };
+
+exports.initializeWithdraw = async (data) => {
+  console.log(process.env.TEST_LAZER_SECRET_KEY);
+  const options = {
+    url: "https://api.lazerpay.engineering/api/v1/transfer",
+    headers: {
+      Authorization: `Bearer ${process.env.TEST_LAZER_SECRET_KEY}`,
+      "content-type": "application/json",
+    },
+    method: "POST",
+    data,
+  };
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await lazer.Payout.transferCrypto(transaction_payload);
+      const response = await axios.request(options);
       resolve(response);
     } catch (error) {
       reject(error);
