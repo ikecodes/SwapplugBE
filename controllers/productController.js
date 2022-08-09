@@ -5,6 +5,11 @@ const AppError = require("../helpers/appError");
 const APIFeatures = require("../helpers/apiFeatures");
 const User = require("../models/userModel");
 const cloudinary = require("../services/cloudinary");
+const {
+  RemoveBgResult,
+  RemoveBgError,
+  removeBackgroundFromImageFile,
+} = require("remove.bg");
 
 module.exports = {
   /**
@@ -13,9 +18,26 @@ module.exports = {
    * @method POST
    */
   createProduct: catchAsync(async (req, res, next) => {
-    const imagesPromises = req.files.map(async (file) => {
+    const removeBgPromise = req.files.map(async (file) => {
+      try {
+        const result = await removeBackgroundFromImageFile({
+          path: file.path,
+          apiKey: process.env.IMAGE_BACKGROUND_REMOVER_KEY,
+          size: "regular",
+          type: "product",
+          crop: true,
+          // scale: "50%",
+        });
+        return `data:image/png;base64,${result.base64img}`;
+      } catch (error) {
+        return next(new AppError("Image upload failed", 400));
+      }
+    });
+
+    const cleanImages = await Promise.all(removeBgPromise);
+    const imagesPromises = cleanImages.map(async (file) => {
       const { secure_url, public_id } = await cloudinary.uploader.upload(
-        file.path,
+        file,
         null,
         { folder: "Product" }
       );
@@ -161,10 +183,28 @@ module.exports = {
       product.images = null;
       product.save();
 
+      // remove image background
+      const removeBgPromise = req.files.map(async (file) => {
+        try {
+          const result = await removeBackgroundFromImageFile({
+            path: file.path,
+            apiKey: process.env.IMAGE_BACKGROUND_REMOVER_KEY,
+            size: "regular",
+            type: "product",
+            crop: true,
+            // scale: "50%",
+          });
+          return `data:image/png;base64,${result.base64img}`;
+        } catch (error) {
+          return next(new AppError("Image upload failed", 400));
+        }
+      });
+
+      const cleanImages = await Promise.all(removeBgPromise);
       // upload the new images
-      const imagesPromises = req.files.map(async (file) => {
+      const imagesPromises = cleanImages.map(async (file) => {
         const { secure_url, public_id } = await cloudinary.uploader.upload(
-          file.path,
+          file,
           null,
           { folder: "Product" }
         );
