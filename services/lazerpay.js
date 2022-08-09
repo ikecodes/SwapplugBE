@@ -49,7 +49,6 @@ const lazer = new Lazerpay(
 // };
 
 exports.initializeWithdraw = async (data) => {
-  console.log(process.env.TEST_LAZER_SECRET_KEY);
   const options = {
     url: "https://api.lazerpay.engineering/api/v1/transfer",
     headers: {
@@ -64,7 +63,7 @@ exports.initializeWithdraw = async (data) => {
       const response = await axios.request(options);
       resolve(response);
     } catch (error) {
-      reject(error);
+      reject(error.response.data);
     }
   });
 };

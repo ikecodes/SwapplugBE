@@ -81,6 +81,8 @@ module.exports = {
     const amountToBeSent = req.body.amount - req.body.fee;
 
     const newPayout = await Payout.create({
+      buyer: req.user._id,
+      seller: order.seller._id,
       order: req.body.orderId,
       amount: amountToBeSent,
       fee: req.body.fee,
@@ -152,6 +154,8 @@ module.exports = {
     const amountToBeSent = req.body.amount - req.body.fee;
 
     const newPayout = await Payout.create({
+      buyer: req.user._id,
+      seller: order.seller._id,
       order: req.body.orderId,
       amount: amountToBeSent,
       fee: req.body.fee,

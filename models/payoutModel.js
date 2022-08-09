@@ -1,6 +1,14 @@
 const mongoose = require("mongoose");
 const payoutSchema = new mongoose.Schema(
   {
+    buyer: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
+    seller: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
     order: {
       type: mongoose.Schema.ObjectId,
       ref: "Order",

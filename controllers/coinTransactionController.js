@@ -3,10 +3,7 @@ const CoinTransaction = require("../models/coinTransactionModel");
 const CoinWallet = require("../models/coinWalletModel");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
-
-const { generateRef } = require("../helpers/generateRef");
 const { initializeWithdraw } = require("../services/lazerpay");
-const { default: axios } = require("axios");
 
 module.exports = {
   /**
@@ -141,32 +138,14 @@ module.exports = {
    * @method POST
    */
   withdraw: catchAsync(async (req, res, next) => {
-    // const transaction_payload = {
-    //   amount: req.body.amount,
-    //   recipient: req.body.recipient, // address must be a bep20 address
-    //   coin: req.body.coin,
-    //   blockchain: "Binance Smart Chain",
-    // };
-
     const data = {
       amount: req.body.amount,
       recipient: req.body.recipient,
       coin: req.body.coin,
-      blockchain: "Binance Smart Chain",
+      blockchain: req.body.blockchain,
     };
 
-    console.log(data);
-
-    const options = {
-      url: "https://api.lazerpay.engineering/api/v1/transfer",
-      headers: {
-        Authorization: `Bearer ${process.env.TEST_LAZER_SECRET_KEY}`,
-      },
-      method: "POST",
-      data,
-    };
-    const response = await axios.request(options);
-
+    const response = await initializeWithdraw(data);
     console.log(response);
     res.status(200).json({
       status: "success",
