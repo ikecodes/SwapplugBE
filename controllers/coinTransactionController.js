@@ -167,4 +167,33 @@ module.exports = {
       data: wallet,
     });
   }),
+
+  /**
+   * @function getAllCoinTransactions
+   * @route /api/v1/coins/getAllCoinTransactions
+   * @method GET
+   */
+  getAllCoinTransactions: catchAsync(async (req, res, next) => {
+    const allCoinTransactions = await CoinTransaction.find({
+      userId: req.user._id,
+    });
+    res.status(200).json({
+      status: "success",
+      data: allCoinTransactions,
+    });
+  }),
+  /**
+   * @function getCoinTransaction
+   * @route /api/v1/coins/getCoinTransaction/:id
+   * @method GET
+   */
+  getCoinTransaction: catchAsync(async (req, res, next) => {
+    const coinTransaction = await CoinTransaction.findById(req.params.id);
+    if (!coinTransaction)
+      return next(new AppError("no transaction with this Id found", 404));
+    res.status(200).json({
+      status: "success",
+      data: coinTransaction,
+    });
+  }),
 };

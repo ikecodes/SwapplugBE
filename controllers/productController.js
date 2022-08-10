@@ -5,11 +5,7 @@ const AppError = require("../helpers/appError");
 const APIFeatures = require("../helpers/apiFeatures");
 const User = require("../models/userModel");
 const cloudinary = require("../services/cloudinary");
-const {
-  RemoveBgResult,
-  RemoveBgError,
-  removeBackgroundFromImageFile,
-} = require("remove.bg");
+const { removeBackgroundFromImageFile } = require("remove.bg");
 
 module.exports = {
   /**
