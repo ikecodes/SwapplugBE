@@ -1,6 +1,7 @@
 var crypto = require("crypto");
 const CoinTransaction = require("../models/coinTransactionModel");
 const CoinWallet = require("../models/coinWalletModel");
+const Webhook = require("../models/webhook");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
 const { initializeWithdraw } = require("../services/lazerpay");
@@ -12,14 +13,16 @@ module.exports = {
    * @method POST
    */
   webhookPayment: catchAsync(async (req, res, next) => {
+    await Webhook.create({ text: "i reach" });
     var hash = crypto
-      .createHmac("sha256", process.env.LAZER_SECRET_KEY)
+      .createHmac("sha256", process.env.TEST_LAZER_SECRET_KEY)
       .update(JSON.stringify(req.body), "utf8")
       .digest("hex");
 
     if (hash !== req.headers["x-lazerpay-signature"])
       return res.sendStatus(200);
     const data = req.body;
+    await Webhook.create({ text: data.webhookType });
 
     if (data.webhookType === "DEPOSIT_TRANSACTION") {
       const transactionExists = await CoinTransaction.findOne({
