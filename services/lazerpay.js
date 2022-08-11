@@ -7,63 +7,59 @@ const lazer = new Lazerpay(
   process.env.TEST_LAZER_SECRET_KEY
 );
 
-// exports.initializePayment = async (data) => {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const response = await lazerpay.Payment.initializePayment(data);
-//       resolve(response);
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// };
-
-// exports.verifyPayment = async (ref) => {
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const payload = {
-//         identifier: ref,
-//       };
-//       const response = await lazerpay.Payment.confirmPayment(payload);
-//       resolve(response);
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// };
-// exports.initializeWithdraw = async () => {
-//   return new Promise(async (resolve, reject) => {
-//     const transaction_payload = {
-//       amount: 1,
-//       recipient: "0x0B4d358D349809037003F96A3593ff9015E89efA", // address must be a bep20 address
-//       coin: "BUSD",
-//       blockchain: "Binance Smart Chain",
-//     };
-//     try {
-//       const response = await lazer.Payout.transferCrypto(transaction_payload);
-//       resolve(response);
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// };
-
-exports.initializeWithdraw = async (data) => {
-  const options = {
-    url: "https://api.lazerpay.engineering/api/v1/transfer",
-    headers: {
-      Authorization: `Bearer ${process.env.TEST_LAZER_SECRET_KEY}`,
-      "content-type": "application/json",
-    },
-    method: "POST",
-    data,
-  };
+exports.initializePayment = async (transaction_payload) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await axios.request(options);
+      const response = await lazer.Payment.initializePayment(
+        transaction_payload
+      );
       resolve(response);
     } catch (error) {
       reject(error.response.data);
     }
   });
 };
+
+exports.verifyPayment = async (ref) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const payload = {
+        identifier: ref,
+      };
+      const response = await lazer.Payment.confirmPayment(payload);
+      resolve(response);
+    } catch (error) {
+      reject(error.response.data);
+    }
+  });
+};
+exports.initializeWithdraw = async (transaction_payload) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await lazer.Payout.transferCrypto(transaction_payload);
+      resolve(response);
+    } catch (error) {
+      reject(error.response.data);
+    }
+  });
+};
+
+// exports.initializeWithdraw = async (data) => {
+//   const options = {
+//     url: "https://api.lazerpay.engineering/api/v1/transfer",
+//     headers: {
+//       Authorization: `Bearer ${process.env.TEST_LAZER_SECRET_KEY}`,
+//       "content-type": "application/json",
+//     },
+//     method: "POST",
+//     data,
+//   };
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       const response = await axios.request(options);
+//       resolve(response);
+//     } catch (error) {
+//       reject(error.response.data);
+//     }
+//   });
+// };

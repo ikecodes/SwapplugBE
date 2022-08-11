@@ -7,9 +7,13 @@ const router = Router();
 router.use(auth);
 
 router.route("/webhook/payment").post(coinTransactionController.webhookPayment);
+
+router.route("/makePayment").post(coinTransactionController.makePayment);
+router.route("/verifyPayment").post(coinTransactionController.verifyPayment);
 router.route("/confirmPayment").post(coinTransactionController.confirmPayment);
-router.route("/withdraw/usdt").post(coinTransactionController.withdraw);
-router.route("/withdraw/ngn").post(coinTransactionController.withdraw);
+
+router.route("/withdraw/usdt").post(coinTransactionController.withdrawUsdt);
+// router.route("/withdraw/ngn").post(coinTransactionController.withdrawNgn);
 
 router.route("/wallet/usdt").get(coinTransactionController.getWallet);
 

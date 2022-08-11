@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     photo: {
       type: String,
       default:
-        "https://res.cloudinary.com/code-inclusive/image/upload/v1658575730/Profile/img8onzlkpg8pb0g4h3y.png",
+        "https://res.cloudinary.com/code-inclusive/image/upload/v1660169213/image_dtz1d9.jpg",
     },
     state: String,
     stateSlug: String,

@@ -4,7 +4,12 @@ const CoinWallet = require("../models/coinWalletModel");
 const Webhook = require("../models/webhook");
 const catchAsync = require("../helpers/catchAsync");
 const AppError = require("../helpers/appError");
-const { initializeWithdraw } = require("../services/lazerpay");
+const {
+  initializeWithdraw,
+  initializePayment,
+  verifyPayment,
+} = require("../services/lazerpay");
+const { generateRef } = require("../helpers/generateRef");
 
 module.exports = {
   /**
@@ -13,7 +18,7 @@ module.exports = {
    * @method POST
    */
   webhookPayment: catchAsync(async (req, res, next) => {
-    await Webhook.create({ text: "i reach" });
+    await Webhook.create({ text: "called webhook" });
     var hash = crypto
       .createHmac("sha256", process.env.TEST_LAZER_SECRET_KEY)
       .update(JSON.stringify(req.body), "utf8")
@@ -21,15 +26,14 @@ module.exports = {
 
     if (hash !== req.headers["x-lazerpay-signature"])
       return res.sendStatus(200);
+
     const data = req.body;
-    await Webhook.create({ text: data.webhookType });
 
     if (data.webhookType === "DEPOSIT_TRANSACTION") {
       const transactionExists = await CoinTransaction.findOne({
         id: data.id,
         reference: data.reference,
       });
-
       if (transactionExists && transactionExists.status !== "confirmed") {
         const coinWalletExists = await CoinWallet.findOne({
           type: data.coin,
@@ -52,9 +56,46 @@ module.exports = {
     } else {
       console.log("for deposite");
     }
-
     res.sendStatus(200);
   }),
+  /**
+   * @function makePayment
+   * @route /api/v1/coins/makePayment
+   * @method POST
+   */
+  makePayment: catchAsync(async (req, res, next) => {
+    const ref = await generateRef(req.user._id);
+    console.log(req.user.firstName, req.user.lastName);
+    const transaction_payload = {
+      reference: ref, // Replace with a reference you generated
+      customer_name: `${req.user.firstName} ${req.user.lastName}`,
+      customer_email: `${req.user.email}`,
+      coin: "USDT",
+      currency: "NGN",
+      amount: req.body.amount,
+      acceptPartialPayment: false, // By default it's false
+    };
+    const response = await initializePayment(transaction_payload);
+    res.status(response.statusCode).json({
+      status: response.status,
+      message: response.message,
+      data: response.data,
+    });
+  }),
+  /**
+   * @function verifyPayment
+   * @route /api/v1/coins/verifyPayment
+   * @method POST
+   */
+  verifyPayment: catchAsync(async (req, res, next) => {
+    const response = await verifyPayment(req.body.ref);
+    res.status(response.statusCode).json({
+      status: response.status,
+      message: response.message,
+      data: response.data,
+    });
+  }),
+
   /**
    * @function confirmPayment
    * @route /api/v1/coins/confirmPayment
@@ -136,25 +177,53 @@ module.exports = {
     });
   }),
   /**
-   * @function withdraw
-   * @route /api/v1/coins/withdraw
+   * @function withdrawUsdt
+   * @route /api/v1/coins/withdraw/usdt
    * @method POST
    */
-  withdraw: catchAsync(async (req, res, next) => {
+  withdrawUsdt: catchAsync(async (req, res, next) => {
+    const userWallet = await CoinWallet.findOne({
+      userId: req.user._id,
+      type: "USDT",
+    });
+    if (userWallet.balance < req.body.amount)
+      return next(
+        new AppError("You do not have enough balance to make withdrawal", 403)
+      );
+    if (req.body.amount < 1)
+      return next(new AppError("You can only withdraw 1 USDT and above", 403));
+
     const data = {
       amount: req.body.amount,
       recipient: req.body.recipient,
-      coin: req.body.coin,
-      blockchain: req.body.blockchain,
+      coin: "USDT",
+      blockchain: "Binance Smart Chain",
     };
-
     const response = await initializeWithdraw(data);
-    console.log(response);
     res.status(200).json({
-      status: "success",
+      status: response.status,
+      message: response.message,
       // data: response,
     });
   }),
+  // /**
+  //  * @function withdrawNgn
+  //  * @route /api/v1/coins/withdraw/ngn
+  //  * @method POST
+  //  */
+  // withdrawNgn: catchAsync(async (req, res, next) => {
+  //   const data = {
+  //     amount: req.body.amount,
+  //     recipient: req.body.recipient,
+  //     coin: req.body.coin,
+  //     blockchain: req.body.blockchain,
+  //   };
+  //   const response = await initializeWithdraw(data);
+  //   console.log(response);
+  //   res.status(200).json({
+  //     status: "success",
+  //   });
+  // }),
   /**
    * @function getWallet
    * @route /api/v1/coins/wallet
