@@ -320,4 +320,32 @@ module.exports = {
       data: coinTransaction,
     });
   }),
+  /**
+   * @function getAllCoinWithdraws
+   * @route /api/v1/coins/getAllCoinWithdraws
+   * @method GET
+   */
+  getAllCoinWithdraws: catchAsync(async (req, res, next) => {
+    const allCoinWithdraws = await CoinWithdraw.find({
+      userId: req.user._id,
+    });
+    res.status(200).json({
+      status: "success",
+      data: allCoinWithdraws,
+    });
+  }),
+  /**
+   * @function getCoinWithdraw
+   * @route /api/v1/coins/getCoinWithdraw/:id
+   * @method GET
+   */
+  getCoinWithdraw: catchAsync(async (req, res, next) => {
+    const coinWithdraw = await CoinWithdraw.findById(req.params.id);
+    if (!coinWithdraw)
+      return next(new AppError("no withdraw with this Id found", 404));
+    res.status(200).json({
+      status: "success",
+      data: coinWithdraw,
+    });
+  }),
 };

@@ -23,4 +23,12 @@ router
 router
   .route("/getCoinTransaction/:id")
   .get(coinTransactionController.getCoinTransaction);
+
+router
+  .route("/getAllCoinWithdraws")
+  .get(coinTransactionController.getAllCoinWithdraws);
+router
+  .route("/getCoinWithdraw/:id")
+  .get(coinTransactionController.getCoinWithdraw);
+
 module.exports = router;
