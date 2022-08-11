@@ -21,12 +21,12 @@ module.exports = {
    */
   webhookPayment: catchAsync(async (req, res, next) => {
     await Webhook.create({ text: "called webhook" });
-    // var hash = crypto
-    //   .createHmac("sha256", process.env.TEST_LAZER_SECRET_KEY)
-    //   .update(JSON.stringify(req.body), "utf8")
-    //   .digest("hex");
-    // if (hash !== req.headers["x-lazerpay-signature"])
-    //   return res.sendStatus(200);
+    var hash = crypto
+      .createHmac("sha256", process.env.TEST_LAZER_SECRET_KEY)
+      .update(JSON.stringify(req.body), "utf8")
+      .digest("hex");
+    if (hash !== req.headers["x-lazerpay-signature"])
+      return res.sendStatus(200);
 
     if (req.body.webhookType === "DEPOSIT_TRANSACTION") {
       const { id, reference, coin, customerEmail, amountPaid, status } =
