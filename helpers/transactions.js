@@ -1,4 +1,5 @@
 const Wallet = require("../models/walletModel");
+const User = require("../models/userModel");
 const Transaction = require("../models/transactionModel");
 const Withdraw = require("../models/withdrawModel");
 const Payout = require("../models/payoutModel");
@@ -113,6 +114,11 @@ exports.sendNGN = async (
         const receiverWallet = await Wallet.findOne({ userId: receiverId });
         receiverWallet.balance += amountToBeSent;
         await receiverWallet.save();
+
+        // update sellers sales
+        const user = await User.findById(receiverId);
+        user.sales = user.sales + 1;
+        user.save();
 
         const payoutPromise = Payout.findByIdAndUpdate(payoutId, {
           status: "completed",
