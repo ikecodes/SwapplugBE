@@ -37,10 +37,9 @@ module.exports = {
       });
 
       if (transactionExists && transactionExists.status !== "confirmed") {
-        const user = await User.findOne({ email: customerEmail });
         const coinWallet = await CoinWallet.findOne({
           type: coin,
-          userId: user._id,
+          userId: transactionExists.userId,
         });
         coinWallet.balance += amountPaid;
         await coinWallet.save();
