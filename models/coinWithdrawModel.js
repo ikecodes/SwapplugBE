@@ -9,7 +9,6 @@ const coinWithdrawSchema = new mongoose.Schema(
     id: String,
     reference: {
       type: String,
-      required: [true, "withdraw must have a reference"],
     },
     senderAddress: String,
     recipientAddress: String,

@@ -1,5 +1,7 @@
 var crypto = require("crypto");
+const User = require("../models/userModel");
 const CoinTransaction = require("../models/coinTransactionModel");
+const CoinWithdraw = require("../models/coinWithdrawModel");
 const CoinWallet = require("../models/coinWalletModel");
 const Webhook = require("../models/webhook");
 const catchAsync = require("../helpers/catchAsync");
@@ -19,42 +21,35 @@ module.exports = {
    */
   webhookPayment: catchAsync(async (req, res, next) => {
     await Webhook.create({ text: "called webhook" });
-    var hash = crypto
-      .createHmac("sha256", process.env.TEST_LAZER_SECRET_KEY)
-      .update(JSON.stringify(req.body), "utf8")
-      .digest("hex");
+    // var hash = crypto
+    //   .createHmac("sha256", process.env.TEST_LAZER_SECRET_KEY)
+    //   .update(JSON.stringify(req.body), "utf8")
+    //   .digest("hex");
+    // if (hash !== req.headers["x-lazerpay-signature"])
+    //   return res.sendStatus(200);
 
-    if (hash !== req.headers["x-lazerpay-signature"])
-      return res.sendStatus(200);
-
-    const data = req.body;
-
-    if (data.webhookType === "DEPOSIT_TRANSACTION") {
+    if (req.body.webhookType === "DEPOSIT_TRANSACTION") {
+      const { id, reference, coin, customerEmail, amountPaid, status } =
+        req.body;
       const transactionExists = await CoinTransaction.findOne({
-        id: data.id,
-        reference: data.reference,
+        id: id,
+        reference: reference,
       });
+
       if (transactionExists && transactionExists.status !== "confirmed") {
-        const coinWalletExists = await CoinWallet.findOne({
-          type: data.coin,
-          userId: data.customer.id,
+        const user = await User.findOne({ email: customerEmail });
+        const coinWallet = await CoinWallet.findOne({
+          type: coin,
+          userId: user._id,
         });
-        if (!coinWalletExists) {
-          await CoinWallet.create({
-            balance: data.amountPaid,
-            type: data.coin,
-            userId: data.customer.id,
-          });
-        } else {
-          coinWalletExists.balance += data.amountPaid;
-          await coinWalletExists.save();
-        }
+        coinWallet.balance += amountPaid;
+        await coinWallet.save();
         await CoinTransaction.findByIdAndUpdate(transactionExists._id, {
-          status: data.status,
+          status: status,
         });
       }
     } else {
-      console.log("for deposite");
+      // task for deposites
     }
     res.sendStatus(200);
   }),
@@ -200,6 +195,19 @@ module.exports = {
       blockchain: "Binance Smart Chain",
     };
     const response = await initializeWithdraw(data);
+    if (response?.status === "success") {
+      await CoinWallet.create({
+        userId: req.user._id,
+        recipientAddress: req.body.recipient,
+        actualAmount: req.body.amount,
+        amountPaid: req.body.amount,
+        amountReceived: req.body.amount,
+        coin: "USDT",
+        type: "withdrawal",
+        status: "incomplete",
+        blockchain: "Binance Smart Chain",
+      });
+    }
     res.status(200).json({
       status: response.status,
       message: response.message,
