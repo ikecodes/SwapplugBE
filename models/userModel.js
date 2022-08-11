@@ -103,11 +103,16 @@ const userSchema = new mongoose.Schema(
 );
 
 //  virtural populate
-// userSchema.virtual("wallet", {
-//   ref: "Wallet",
-//   foreignField: "userId",
-//   localField: "_id",
-// });
+userSchema.virtual("wallet", {
+  ref: "Wallet",
+  localField: "_id",
+  foreignField: "userId",
+});
+userSchema.virtual("usdtWallet", {
+  ref: "CoinWallet",
+  localField: "_id",
+  foreignField: "userId",
+});
 
 // userSchema.pre(/^find/, function (next) {
 //   this.populate("wallet");

@@ -161,7 +161,7 @@ module.exports = {
    * @method GET
    */
   getMe: catchAsync(async (req, res, next) => {
-    const user = await User.findOne({ _id: req.user._id });
+    const user = await User.findOne({ _id: req.user._id }).populate("wallet");
     if (!user) return next(new AppError("Please login to gain access", 403));
 
     const stats = await Product.aggregate([
