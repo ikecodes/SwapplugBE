@@ -49,6 +49,51 @@ module.exports = {
       }
     } else {
       // task for deposites
+      const {
+        id,
+        reference,
+        senderAddress,
+        recipientAddress,
+        actualAmount,
+        amountPaid,
+        amountReceived,
+        coin,
+        hash,
+        blockNumber,
+        network,
+        blockchain,
+        feeInCrypto,
+        status,
+      } = req.body;
+      const withdrawExists = await CoinWithdraw.findOne({
+        status: "incomplete",
+        recipientAddress,
+        amountPaid,
+      });
+      if (withdrawExists && withdrawExists.status !== "confirmed") {
+        const coinWallet = await CoinWallet.findOne({
+          type: coin,
+          userId: withdrawExists.userId,
+        });
+        coinWallet.balance -= amountPaid;
+        await coinWallet.save();
+        await CoinWithdraw.findByIdAndUpdate(withdrawExists._id, {
+          id,
+          reference,
+          senderAddress,
+          recipientAddress,
+          actualAmount,
+          amountPaid,
+          amountReceived,
+          coin,
+          hash,
+          blockNumber,
+          network,
+          blockchain,
+          feeInCrypto,
+          status,
+        });
+      }
     }
     res.sendStatus(200);
   }),
@@ -195,7 +240,7 @@ module.exports = {
     };
     const response = await initializeWithdraw(data);
     if (response?.status === "success") {
-      await CoinWallet.create({
+      await CoinWithdraw.create({
         userId: req.user._id,
         recipientAddress: req.body.recipient,
         actualAmount: req.body.amount,
